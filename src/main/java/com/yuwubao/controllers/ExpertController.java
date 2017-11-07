@@ -142,4 +142,46 @@ public class ExpertController {
         return result;
     }
 
+    /**
+     * 获取智库专家详情
+     * @param id  智库专家id
+     * @return
+     */
+    @GetMapping("/expertDetails")
+    public RestApiResponse<ExpertEntity> findExpertById(@RequestParam int id) {
+        RestApiResponse<ExpertEntity> result= new RestApiResponse<ExpertEntity>();
+        try {
+            ExpertEntity expertEntity = expertService.findById(id);
+            if (expertEntity == null) {
+                result.failedApiResponse(Const.FAILED, "智库专家不存在");
+                return result;
+            }
+            result.successResponse(Const.SUCCESS, expertEntity);
+        } catch (Exception e) {
+            logger.warn("获取智库专家异常", e);
+            result.failedApiResponse(Const.FAILED, "获取智库专家异常");
+        }
+        return result;
+    }
+
+    /**
+     * 获取所有智库专家
+     */
+    @GetMapping("/getExpertAll")
+    public RestApiResponse<List<ExpertEntity>> findExpertAll() {
+        RestApiResponse<List<ExpertEntity>> result = new RestApiResponse<List<ExpertEntity>>();
+        try {
+            List<ExpertEntity> list = expertService.getAll();
+            if (list.size() == 0) {
+                result.failedApiResponse(Const.FAILED, "暂无数据");
+                return result;
+            }
+            result.successResponse(Const.SUCCESS, list);
+        } catch (Exception e) {
+            logger.warn("获取所有智库专家异常", e);
+            result.failedApiResponse(Const.FAILED, "获取所有智库专家异常");
+        }
+        return result;
+    }
+
 }

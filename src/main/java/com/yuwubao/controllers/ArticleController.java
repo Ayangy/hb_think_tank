@@ -143,19 +143,24 @@ public class ArticleController {
 
     }
 
-    @GetMapping("/getOne")
-    public RestApiResponse<ArticleEntity> getOne(@RequestParam int id) {
+    /**
+     * 获取文章详情
+     * @param id  文章id
+     * @return
+     */
+    @GetMapping("/articleDetails")
+    public RestApiResponse<ArticleEntity> findArticleById(@RequestParam int id) {
         RestApiResponse<ArticleEntity> result = new RestApiResponse<ArticleEntity>();
         try {
-            ArticleEntity entity = articleService.findById(id);
-            if (entity == null) {
+            ArticleEntity articleEntity = articleService.findById(id);
+            if (articleEntity == null) {
                 result.failedApiResponse(Const.FAILED, "文章不存在");
                 return result;
             }
-            result.successResponse(Const.SUCCESS, entity);
+            result.successResponse(Const.SUCCESS, articleEntity);
         } catch (Exception e) {
-            logger.warn("获取文章异常", e);
-            result.failedApiResponse(Const.FAILED, "获取文章异常");
+            logger.warn("文章获取异常", e);
+            result.failedApiResponse(Const.FAILED, "文章获取异常");
         }
         return result;
     }
