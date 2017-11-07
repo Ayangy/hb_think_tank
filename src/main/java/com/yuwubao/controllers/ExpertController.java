@@ -125,7 +125,7 @@ public class ExpertController {
     }
 
     /**
-     * 拼音首字母查询专家
+     * 通过拼音首字母查询专家
      * @param letter 字母
      * @return
      */

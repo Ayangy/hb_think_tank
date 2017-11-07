@@ -1,9 +1,7 @@
 package com.yuwubao.controllers;
 
 import com.yuwubao.entities.ArticleEntity;
-import com.yuwubao.entities.VideoEntity;
 import com.yuwubao.services.ArticleService;
-import com.yuwubao.services.VideoService;
 import com.yuwubao.util.Const;
 import com.yuwubao.util.RestApiResponse;
 import org.slf4j.Logger;
@@ -28,9 +26,6 @@ public class HomePageController {
 
     @Autowired
     private ArticleService articleService;
-
-    @Autowired
-    private VideoService VideoService;
 
     /**
      * 获取文章
@@ -58,29 +53,7 @@ public class HomePageController {
         return result;
     }
 
-    /**
-     * 获取视频新闻
-     * @param index  第几页
-     * @param size 每页几条
-     * @return
-     */
-    @GetMapping("/videoNews")
-    public RestApiResponse<List<VideoEntity>> getVideoNews(@RequestParam(defaultValue = "0", required = false) int index,
-                                                           @RequestParam(defaultValue = "1", required = false) int size) {
-        RestApiResponse<List<VideoEntity>> result = new RestApiResponse<List<VideoEntity>>();
-        try {
-            List<VideoEntity> list = VideoService.getNewsVideo(index, size);
-            if (list.size() == 0) {
-                result.failedApiResponse(Const.FAILED, "暂无数据");
-                return result;
-            }
-            result.successResponse(Const.SUCCESS, list);
-        } catch (Exception e) {
-           logger.warn("视频新闻获取异常", e);
-           result.failedApiResponse(Const.FAILED, "视频新闻获取异常");
-        }
-        return result;
-    }
+
 
 }
 
