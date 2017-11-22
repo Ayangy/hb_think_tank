@@ -15,7 +15,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 前端首页数据
@@ -177,6 +179,99 @@ public class FrontEndController {
         } catch (Exception e) {
             logger.warn("文章分类查询异常", e);
             result.failedApiResponse(Const.FAILED, "文章分类查询异常");
+        }
+        return result;
+    }
+
+    /**
+     * 智库成果多条件查询
+     * @param index  第几页
+     * @param size  每页几条
+     * @param field  查询字段
+     * @param keyword  查询值
+     * @param textTypeId  文章类型
+     * @param parentId  父级文章类型
+     * @param timeHorizon  时间范围 1(三天内),2(一周内),3(一月内),4(半年内),5(一年内)
+     * @param sort  排序 0(降序),1(升序)
+     * @return
+     */
+    @GetMapping("/findResultByCriteria")
+    public RestApiResponse<List<ArticleEntity>> findResultByCriteria(@RequestParam(defaultValue = "0", required = false)int index,
+                                                          @RequestParam(defaultValue = "10", required = false)int size,
+                                                          @RequestParam(required = false, defaultValue = "")String field,
+                                                          @RequestParam(required = false, defaultValue = "")String keyword,
+                                                          @RequestParam(required = false, defaultValue = "0")int textTypeId,
+                                                          @RequestParam(required = false, defaultValue = "0")int parentId,
+                                                          @RequestParam(required = false, defaultValue = "0")int timeHorizon,
+                                                          @RequestParam(required = false, defaultValue = "0")int sort) {
+        RestApiResponse<List<ArticleEntity>> result = new RestApiResponse<List<ArticleEntity>>();
+        try {
+            Map<String, String> map = new HashMap<String, String>();
+            map.put("field", field);
+            map.put("keyword", keyword);
+            List<ArticleEntity> list = articleService.findByCriteria(map, textTypeId, parentId, timeHorizon, sort, index, size);
+            result.successResponse(Const.SUCCESS, list);
+        } catch (Exception e) {
+            logger.warn("查询失败", e);
+            result.failedApiResponse(Const.FAILED, "查询失败");
+        }
+        return result;
+    }
+
+    /**
+     * 获取五个同类文章
+     * @param textTypeId  文章类型id
+     * @return
+     */
+    @GetMapping("/getKind")
+    public RestApiResponse<List<ArticleEntity>> getKind(int textTypeId,
+                                                        @RequestParam(defaultValue = "0", required = false) int index,
+                                                        @RequestParam(defaultValue = "5", required = false) int size){
+        RestApiResponse<List<ArticleEntity>> result = new RestApiResponse<List<ArticleEntity>>();
+        try {
+            List<ArticleEntity> list = articleService.getKind(textTypeId, index, size);
+            result.successResponse(Const.SUCCESS, list);
+        } catch (Exception e) {
+            logger.warn("获取同类文章异常", e);
+            result.failedApiResponse(Const.FAILED, "获取同类文章异常");
+        }
+        return result;
+    }
+
+    /**
+     * 获取五个推荐文章
+     * @param recommend 是否推荐 0(否)，1(是)
+     * @return
+     */
+    @GetMapping("/getRecommendArticle")
+    public RestApiResponse<List<ArticleEntity>> getRecommendArticle(@RequestParam(required = false, defaultValue = "1")int recommend,
+                                                                    @RequestParam(defaultValue = "0", required = false) int index,
+                                                                    @RequestParam(defaultValue = "5", required = false) int size) {
+        RestApiResponse<List<ArticleEntity>> result = new RestApiResponse<List<ArticleEntity>>();
+        try {
+            List<ArticleEntity> list = articleService.getRecommendArticle(recommend, index, size);
+            result.successResponse(Const.SUCCESS, list);
+        } catch (Exception e) {
+            logger.warn("获取推荐文章异常", e);
+            result.failedApiResponse(Const.FAILED, "获取推荐文章异常");
+        }
+        return result;
+    }
+
+    /**
+     * 获取五个最新文章
+     * @return
+     */
+    @GetMapping("/getNewestArticle")
+    public RestApiResponse<List<ArticleEntity>> getNewestArticle(@RequestParam(defaultValue = "0", required = false) int index,
+                                                                 @RequestParam(defaultValue = "5", required = false) int size) {
+        RestApiResponse<List<ArticleEntity>> result = new RestApiResponse<List<ArticleEntity>>();
+        try {
+            List<ArticleEntity> list = articleService.getNewestArticle(index, size);
+            result.successResponse(Const.SUCCESS, list);
+        } catch (Exception e) {
+            logger.warn("获取最新文章异常", e);
+            result.failedApiResponse(Const.FAILED, "获取最新文章异常");
         }
         return result;
     }
