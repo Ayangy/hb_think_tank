@@ -1,23 +1,17 @@
 package com.yuwubao.controllers;
 
-import com.yuwubao.entities.ArticleEntity;
-import com.yuwubao.entities.ExpertEntity;
-import com.yuwubao.entities.OrganizationEntity;
-import com.yuwubao.entities.VideoEntity;
-import com.yuwubao.services.ArticleService;
-import com.yuwubao.services.ExpertService;
-import com.yuwubao.services.OrganizationService;
-import com.yuwubao.services.VideoService;
+import com.yuwubao.entities.*;
+import com.yuwubao.services.*;
 import com.yuwubao.util.Const;
 import com.yuwubao.util.RestApiResponse;
+import com.yuwubao.util.ThinkTankUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 前端首页数据
@@ -43,6 +37,12 @@ public class FrontEndController {
 
     @Autowired
     private VideoService videoService;
+
+    @Autowired
+    private RoleService roleService;
+
+    @Autowired
+    private UserService userService;
 
     /**
      * 获取未屏蔽的最新文章
@@ -72,14 +72,91 @@ public class FrontEndController {
      * @return
      */
     @GetMapping("/findExpertByLetter")
-    public RestApiResponse<List<ExpertEntity>> findExpertByLetter(@RequestParam String letter) {
-        RestApiResponse<List<ExpertEntity>> result = new RestApiResponse<List<ExpertEntity>>();
+    public RestApiResponse<Map<String, List<ExpertEntity>>> findExpertByLetter(@RequestParam(defaultValue = "", required = false) String letter,
+                                                                               @RequestParam(defaultValue = "0", required = false) int type) {
+        RestApiResponse<Map<String, List<ExpertEntity>>> result = new RestApiResponse<Map<String, List<ExpertEntity>>>();
+        Map<String, List<ExpertEntity>> map = new HashMap<String, List<ExpertEntity>>();
         try {
-            List<ExpertEntity> list = expertService.findExpertByLetter(letter);
-            result.successResponse(Const.SUCCESS, list);
+            if (!StringUtils.isNotBlank(letter)) {
+                String alphabet;
+                for (char i = 'A' ; i<= 'Z'; i++ ){
+                    alphabet = String.valueOf(i);
+                    List<ExpertEntity> entityList = expertService.findExpertByLetter(alphabet, type);
+                    map.put(alphabet,entityList);
+                }
+                result.successResponse(Const.SUCCESS, map);
+                return result;
+            }
+            List<ExpertEntity> entities = expertService.findExpertByLetter(letter, type);
+            map.put(letter, entities);
+            result.successResponse(Const.SUCCESS, map);
         } catch (Exception e) {
             logger.warn("通过字母查询专家异常", e);
             result.failedApiResponse(Const.FAILED, "通过首字母查询专家异常");
+        }
+        return result;
+    }
+
+    /**
+     * 查询专家详情
+     * @param id  专家id
+     * @return
+     */
+    @GetMapping("/queryAnExpert")
+    public RestApiResponse<List<ExpertEntity>> queryAnExpert(@RequestParam int id){
+        RestApiResponse<List<ExpertEntity>> result = new RestApiResponse<List<ExpertEntity>>();
+        try {
+            List<ExpertEntity> entity = expertService.queryAnExpert(id);
+            if (entity.size() == 0) {
+                result.failedApiResponse(Const.FAILED, "专家不存在");
+                return result;
+            }
+            result.successResponse(Const.SUCCESS, entity);
+        } catch (Exception e) {
+            logger.warn("查询专家异常", e);
+            result.failedApiResponse(Const.FAILED, "查询专家异常");
+        }
+        return result;
+    }
+
+    /**
+     * 条件查询专家
+     * @param field  查询字段
+     * @param keyword  查询值
+     * @return
+     */
+    @GetMapping("/findExpertByCondition")
+    public RestApiResponse<Map<String, List<ExpertEntity>>> findExpertByCondition(@RequestParam(required = false, defaultValue = "")String field,
+                                                       @RequestParam(required = false, defaultValue = "")String keyword){
+        RestApiResponse<Map<String, List<ExpertEntity>>> result = new RestApiResponse<Map<String, List<ExpertEntity>>>();
+        Map<String, List<ExpertEntity>> endResult = new HashMap<String, List<ExpertEntity>>();
+        try {
+            Map<String, String> map = new HashMap();
+            map.put("field", field);
+            map.put("keyword", keyword);
+            List<ExpertEntity> list = expertService.findExpertByCondition(map);
+            List<String> letter = new ArrayList<String>();
+            for (ExpertEntity entity : list) {
+                String substring = entity.getName().substring(0, 1);
+                String pyIndexStr = ThinkTankUtil.getPYIndexStr(substring, true);
+                letter.add(pyIndexStr);
+            }
+
+            for (String s : letter) {
+                List<ExpertEntity> entities = new ArrayList<ExpertEntity>();
+                for (ExpertEntity expertEntity: list) {
+                    String substring = expertEntity.getName().substring(0, 1);
+                    String pyIndexStr = ThinkTankUtil.getPYIndexStr(substring, true);
+                    if (s.equals(pyIndexStr)) {
+                        entities.add(expertEntity);
+                    }
+                }
+                endResult.put(s, entities);
+            }
+            result.successResponse(Const.SUCCESS, endResult);
+        } catch (Exception e) {
+            logger.warn("查询专家列表异常", e);
+            result.failedApiResponse(Const.FAILED, "专家列表查询异常");
         }
         return result;
     }
@@ -91,12 +168,24 @@ public class FrontEndController {
      * @return
      */
     @GetMapping("/findOrganizationByLetter")
-    public RestApiResponse<List<OrganizationEntity>> findByLetter(@RequestParam(defaultValue = "0", required = false) int type,
-                                                                  @RequestParam String letter) {
-        RestApiResponse<List<OrganizationEntity>> result = new RestApiResponse<List<OrganizationEntity>>();
+    public RestApiResponse<Map<String, List<OrganizationEntity>>> findByLetter(@RequestParam(defaultValue = "0", required = false) int type,
+                                                                  @RequestParam(defaultValue = "", required = false) String letter) {
+        RestApiResponse<Map<String, List<OrganizationEntity>>> result = new RestApiResponse<Map<String, List<OrganizationEntity>>>();
+        Map<String, List<OrganizationEntity>> map = new HashMap<String, List<OrganizationEntity>>();
         try {
-            List<OrganizationEntity> list = organizationService.finByLetter(type, letter, shield);
-            result.successResponse(Const.SUCCESS, list);
+            if (!StringUtils.isNotBlank(letter)) {
+                String alphabet;
+                for (char i = 'A' ; i<= 'Z'; i++ ){
+                    alphabet = String.valueOf(i);
+                    List<OrganizationEntity> list = organizationService.finByLetter(alphabet, type);
+                    map.put(alphabet,list);
+                }
+                result.successResponse(Const.SUCCESS, map);
+                return result;
+            }
+            List<OrganizationEntity> entities = organizationService.finByLetter(letter, type);
+            map.put(letter, entities);
+            result.successResponse(Const.SUCCESS, map);
         } catch (Exception e) {
             logger.warn("通过字母查询异常", e);
             result.failedApiResponse(Const.FAILED, "通过字母查询异常");
@@ -272,6 +361,42 @@ public class FrontEndController {
         } catch (Exception e) {
             logger.warn("获取最新文章异常", e);
             result.failedApiResponse(Const.FAILED, "获取最新文章异常");
+        }
+        return result;
+    }
+
+    /**
+     * 注册用户
+     */
+    @PostMapping("/registeredUser")
+    public RestApiResponse<UserEntity> registeredUser(@RequestBody UserEntity userEntity,
+                                           @RequestParam(required = false, defaultValue = "1")int type) {
+        RestApiResponse<UserEntity> result = new RestApiResponse<UserEntity>();
+        try {
+            if (!StringUtils.isNotBlank(userEntity.getUsername())) {
+                result.failedApiResponse(Const.FAILED, "未设置用户名");
+                return result;
+            }
+            if (!StringUtils.isNotBlank(userEntity.getPassword())) {
+                result.failedApiResponse(Const.FAILED, "未设置密码");
+                return result;
+            }
+            UserEntity entity = userService.findByUsernameAndType(userEntity.getUsername(), type);
+            if (entity != null) {
+                result.failedApiResponse(Const.FAILED, "用户名已存在");
+                return result;
+            }
+            userEntity.setCreateTime(new Date());
+            userEntity.setType(type);
+            UserEntity user = userService.add(userEntity);
+            if (user == null) {
+                result.failedApiResponse(Const.FAILED, "添加失败");
+                return result;
+            }
+            result.successResponse(Const.SUCCESS, user, "注册成功");
+        } catch (Exception e) {
+            logger.warn("注册用户异常:", e);
+            result.failedApiResponse(Const.FAILED, "注册用户异常");
         }
         return result;
     }

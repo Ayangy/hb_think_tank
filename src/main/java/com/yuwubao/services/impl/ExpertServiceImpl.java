@@ -91,10 +91,10 @@ public class ExpertServiceImpl implements ExpertService {
     }
 
     @Override
-    public List<ExpertEntity> findExpertByLetter(String letter) {
-        String sql = "select * from zk_expert where get_first_pinyin_char(name) = ?";
+    public List<ExpertEntity> findExpertByLetter(String letter, int type) {
+        String sql = "select * from zk_expert where shield=0 AND type = ? AND get_first_pinyin_char(name) = ?";
         RowMapper<ExpertEntity> rowMapper = new BeanPropertyRowMapper<>(ExpertEntity.class);
-        List<ExpertEntity> list = jdbcTemplate.query(sql, rowMapper, letter);
+        List<ExpertEntity> list = jdbcTemplate.query(sql, rowMapper, type, letter);
         return list;
     }
 
@@ -102,5 +102,35 @@ public class ExpertServiceImpl implements ExpertService {
     public List<ExpertEntity> findByShield(int shield) {
         List<ExpertEntity> list = expertRepository.findByShield(shield);
         return list;
+    }
+
+    @Override
+    public List<ExpertEntity> queryAnExpert(int id) {
+        String sql = "select * from zk_expert where shield=0 AND id = ?";
+        RowMapper<ExpertEntity> rowMapper = new BeanPropertyRowMapper<>(ExpertEntity.class);
+        List<ExpertEntity> list = jdbcTemplate.query(sql, rowMapper, id);
+        return list;
+    }
+
+    @Override
+    public List<ExpertEntity> findExpertByCondition(Map<String, String> map) {
+        String field = map.get("field");
+        String keyword = map.get("keyword");
+        Specification<ExpertEntity> spec = new Specification<ExpertEntity>() {
+            @Override
+            public Predicate toPredicate(Root<ExpertEntity> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder){
+                Predicate predict = criteriaBuilder.conjunction();
+                if (StringUtils.isNotBlank(field)) {
+                    Path<String> exp1 = root.get(field);
+                    if (StringUtils.isNotBlank(keyword)) {
+                        predict.getExpressions().add(criteriaBuilder.like(exp1, "%" + keyword + "%"));
+                    }
+                }
+                Path<Integer> path = root.get("shield");
+                predict.getExpressions().add(criteriaBuilder.equal(path, String.valueOf(0)));
+                return predict;
+            }
+        };
+        return expertRepository.findAll(spec);
     }
 }
