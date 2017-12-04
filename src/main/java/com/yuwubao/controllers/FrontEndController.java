@@ -127,14 +127,15 @@ public class FrontEndController {
      */
     @GetMapping("/findExpertByCondition")
     public RestApiResponse<Map<String, List<ExpertEntity>>> findExpertByCondition(@RequestParam(required = false, defaultValue = "")String field,
-                                                       @RequestParam(required = false, defaultValue = "")String keyword){
+                                                                                  @RequestParam(required = false, defaultValue = "")String keyword,
+                                                                                  @RequestParam(required = false, defaultValue = "0")int countryType){
         RestApiResponse<Map<String, List<ExpertEntity>>> result = new RestApiResponse<Map<String, List<ExpertEntity>>>();
         Map<String, List<ExpertEntity>> endResult = new HashMap<String, List<ExpertEntity>>();
         try {
             Map<String, String> map = new HashMap();
             map.put("field", field);
             map.put("keyword", keyword);
-            List<ExpertEntity> list = expertService.findExpertByCondition(map);
+            List<ExpertEntity> list = expertService.findExpertByCondition(map, countryType);
             List<String> letter = new ArrayList<String>();
             for (ExpertEntity entity : list) {
                 String substring = entity.getName().substring(0, 1);
@@ -168,7 +169,7 @@ public class FrontEndController {
      * @return
      */
     @GetMapping("/findOrganizationByLetter")
-    public RestApiResponse<Map<String, List<OrganizationEntity>>> findByLetter(@RequestParam(defaultValue = "0", required = false) int type,
+    public RestApiResponse<Map<String, List<OrganizationEntity>>> findByLetter(@RequestParam(defaultValue = "1", required = false) int type,
                                                                   @RequestParam(defaultValue = "", required = false) String letter) {
         RestApiResponse<Map<String, List<OrganizationEntity>>> result = new RestApiResponse<Map<String, List<OrganizationEntity>>>();
         Map<String, List<OrganizationEntity>> map = new HashMap<String, List<OrganizationEntity>>();
@@ -194,23 +195,23 @@ public class FrontEndController {
     }
 
     /**
-     * 模糊查询未屏蔽机构名
+     * 条件查询未屏蔽机构名
      * @param field 查询字段
      * @param keyword  查询值
-     * @param type  机构类型0(智库机构)，1(智库联盟)
+     * @param organizationType  1(大学),2(政府)
      * @return
      */
-    @GetMapping("/findOrganizationByName")
-    public RestApiResponse<Map<String, List<OrganizationEntity>>> findByName(@RequestParam(required = false, defaultValue = "")String field,
-                                                                @RequestParam(required = false, defaultValue = "")String keyword,
-                                                                @RequestParam(defaultValue = "0", required = false) int type) {
+    @GetMapping("/findOrganizationByCondition")
+    public RestApiResponse<Map<String, List<OrganizationEntity>>> findOrganizationByCondition(@RequestParam(required = false, defaultValue = "")String field,
+                                                                             @RequestParam(required = false, defaultValue = "")String keyword,
+                                                                             @RequestParam(defaultValue = "0", required = false) int organizationType) {
         RestApiResponse<Map<String, List<OrganizationEntity>>> result = new RestApiResponse<Map<String, List<OrganizationEntity>>>();
         Map<String, List<OrganizationEntity>> endResult = new HashMap<String, List<OrganizationEntity>>();
         try {
             Map<String, String> map = new HashMap();
             map.put("field", field);
             map.put("keyword", keyword);
-            List<OrganizationEntity> list = organizationService.findByCondition(map, type);
+            List<OrganizationEntity> list = organizationService.findByCondition(map, organizationType);
             List<String> letter = new ArrayList<String>();
             for (OrganizationEntity entity : list) {
                 String substring = entity.getName().substring(0, 1);
@@ -233,6 +234,84 @@ public class FrontEndController {
         } catch (Exception e) {
             logger.warn("机构名模糊查询异常", e);
             result.failedApiResponse(Const.FAILED, "机构名模糊查询异常");
+        }
+        return result;
+    }
+
+    /**
+     * 获取本机构
+     *
+     */
+    @GetMapping("/getThisInstitution")
+    public RestApiResponse<OrganizationEntity> getThisInstitution(){
+        RestApiResponse<OrganizationEntity> result = new RestApiResponse<OrganizationEntity>();
+        try {
+            OrganizationEntity organizationEntity = organizationService.findByType(0);
+            if (organizationEntity == null) {
+                result.failedApiResponse(Const.FAILED, "暂未添加本机构数据");
+                return result;
+            }
+            result.successResponse(Const.SUCCESS, organizationEntity);
+        } catch (Exception e) {
+            logger.warn("获取本机构数据异常", e);
+            result.failedApiResponse(Const.FAILED, "获取本机构数据异常");
+        }
+        return result;
+    }
+
+    /**
+     * 获取机构介绍
+     * @param id
+     * @return
+     */
+    @GetMapping("/organizationDetails")
+    public RestApiResponse<OrganizationEntity> findOrganizationByid(@RequestParam int id) {
+        RestApiResponse<OrganizationEntity> result = new RestApiResponse<OrganizationEntity>();
+        try {
+            OrganizationEntity organizationEntity = organizationService.findOne(id);
+            result.successResponse(Const.SUCCESS, organizationEntity);
+        } catch (Exception e) {
+            logger.warn("查询机构异常", e);
+            result.failedApiResponse(Const.FAILED, "查询机构异常");
+        }
+        return result;
+    }
+
+    /**
+     * 获取当前机构最新一条公告
+     * @param id  机构id
+     * @return
+     */
+    @GetMapping("/getOrganizationNotice")
+    public RestApiResponse<ArticleEntity> getOrganizationNotice(@RequestParam int id,
+                                                                @RequestParam int textTypeId) {
+        RestApiResponse<ArticleEntity> result = new RestApiResponse<ArticleEntity>();
+        try {
+            ArticleEntity articleEntity = articleService.getAnOrganizationNotice(id, textTypeId);
+            result.successResponse(Const.SUCCESS, articleEntity);
+        } catch (Exception e) {
+            logger.warn("获取最新公告异常", e);
+            result.failedApiResponse(Const.FAILED, "获取最新公告异常");
+        }
+        return result;
+    }
+
+    /**
+     *  获取当前机构的活动动态
+     *  @param id   机构id
+     * @return
+     */
+    @GetMapping("/getOrganizationActivity")
+    public RestApiResponse<List<ArticleEntity>> get(@RequestParam int id,@RequestParam int textTypeId,
+                                                    @RequestParam(defaultValue = "0", required = false) int index,
+                                                    @RequestParam(defaultValue = "4", required = false) int size) {
+        RestApiResponse<List<ArticleEntity>> result = new RestApiResponse<List<ArticleEntity>>();
+        try {
+            List<ArticleEntity> articleEntityList = articleService.getOrganizationActivity(id, textTypeId, index, size);
+            result.successResponse(Const.SUCCESS, articleEntityList);
+        } catch (Exception e) {
+            logger.warn("获取机构活动异常", e);
+            result.failedApiResponse(Const.FAILED, "获取机构活动异常");
         }
         return result;
     }
@@ -273,6 +352,24 @@ public class FrontEndController {
         return result;
     }
 
+    @GetMapping("/getVideoDetails")
+    public RestApiResponse<VideoEntity> getVideoDetails(@RequestParam int id) {
+        RestApiResponse<VideoEntity> result = new RestApiResponse<VideoEntity>();
+        try {
+            VideoEntity entity = videoService.findOne(id);
+            if (entity == null) {
+                result.failedApiResponse(Const.FAILED, "音视频不存在");
+                return result;
+            }
+            result.successResponse(Const.SUCCESS, entity);
+        } catch (Exception e) {
+            logger.warn("查询视频详情异常", e);
+            result.failedApiResponse(Const.FAILED, "查询视频详情异常");
+        }
+        return result;
+
+    }
+
     /**
      * 分类查询未屏蔽文章
      * @param textTypeId  文章类型
@@ -300,30 +397,34 @@ public class FrontEndController {
      * 智库成果多条件查询
      * @param index  第几页
      * @param size  每页几条
-     * @param field  查询字段
+
      * @param keyword  查询值
-     * @param textTypeId  文章类型
-     * @param parentId  父级文章类型
-     * @param timeHorizon  时间范围 1(三天内),2(一周内),3(一月内),4(半年内),5(一年内)
+     * @param textTypeIds  文章类型
      * @param sort  排序 0(降序),1(升序)
      * @return
      */
     @GetMapping("/findResultByCriteria")
     public RestApiResponse<List<ArticleEntity>> findResultByCriteria(@RequestParam(defaultValue = "0", required = false)int index,
                                                           @RequestParam(defaultValue = "10", required = false)int size,
-                                                          @RequestParam(required = false, defaultValue = "")String field,
                                                           @RequestParam(required = false, defaultValue = "")String keyword,
-                                                          @RequestParam(required = false, defaultValue = "0")int textTypeId,
-                                                          @RequestParam(required = false, defaultValue = "0")int parentId,
-                                                          @RequestParam(required = false, defaultValue = "0")int timeHorizon,
+                                                          @RequestParam(required = false, defaultValue = "")String textTypeIds,
                                                           @RequestParam(required = false, defaultValue = "0")int sort) {
         RestApiResponse<List<ArticleEntity>> result = new RestApiResponse<List<ArticleEntity>>();
         try {
             Map<String, String> map = new HashMap<String, String>();
-            map.put("field", field);
             map.put("keyword", keyword);
-            List<ArticleEntity> list = articleService.findByCriteria(map, textTypeId, parentId, timeHorizon, sort, index, size);
-            result.successResponse(Const.SUCCESS, list);
+            String[] sourceStrArray = textTypeIds.split(",");
+            List<ArticleEntity> resultList = new ArrayList<ArticleEntity>();
+            if (StringUtils.isNotBlank(textTypeIds)) {
+                for (String textType:sourceStrArray) {
+                    int textTypeId = Integer.parseInt(textType);
+                    List<ArticleEntity> list = articleService.findByCriteria(map, textTypeId, sort, index, size);
+                    for (ArticleEntity entity : list) {
+                        resultList.add(entity);
+                    }
+                }
+            }
+            result.successResponse(Const.SUCCESS, resultList);
         } catch (Exception e) {
             logger.warn("查询失败", e);
             result.failedApiResponse(Const.FAILED, "查询失败");
@@ -424,5 +525,108 @@ public class FrontEndController {
         }
         return result;
     }
+
+    /**
+     * 未屏蔽机构列表
+     */
+    @GetMapping("/getOrganizationList")
+    public RestApiResponse<List<OrganizationEntity>> getOrganizationList() {
+        RestApiResponse<List<OrganizationEntity>> result = new RestApiResponse<>();
+        try {
+            List<OrganizationEntity > list =  organizationService.findByShieldAndType(0,1);
+            result.successResponse(Const.SUCCESS, list);
+        } catch (Exception e) {
+            logger.warn("获取机构列表失败", e);
+            result.failedApiResponse(Const.FAILED, "获取机构列表失败");
+        }
+        return result;
+    }
+
+
+    /**
+     * 获取所有文章
+     * @param parentId
+     * @return
+     */
+    @GetMapping("/getArticleList")
+    public RestApiResponse<List<ArticleEntity>> getAchievementList(@RequestParam int parentId) {
+        RestApiResponse<List<ArticleEntity>> result = new RestApiResponse<>();
+        try {
+            List<ArticleEntity> entityList = articleService.findByTextTypeIdAndShield(parentId, 0);
+            result.successResponse(Const.SUCCESS, entityList);
+        } catch (Exception e) {
+            logger.warn("获取文章列表失败", e);
+            result.failedApiResponse(Const.FAILED, "获取文章列表失败");
+        }
+        return result;
+    }
+
+    /**
+     * 获取指定机构文章
+     * @param textTypeId  文章类型id
+     * @param organizationId 机构id
+     * @param index  第几页
+     * @param size  每页几条
+     * @return
+     */
+    @GetMapping("/getInstitutionArticle")
+    public RestApiResponse<List<ArticleEntity>> getInstitutionArticle(@RequestParam int textTypeId, @RequestParam int organizationId,
+                                                                      @RequestParam(defaultValue = "0", required = false) int index,
+                                                                      @RequestParam(defaultValue = "5", required = false) int size) {
+        RestApiResponse<List<ArticleEntity>> result = new RestApiResponse<>();
+        try {
+            List<ArticleEntity> entityList = articleService.findOrganizationArticle(textTypeId, organizationId, index, size, 0);
+            result.successResponse(Const.SUCCESS, entityList);
+        } catch (Exception e) {
+            logger.warn("获取文章列表失败", e);
+            result.failedApiResponse(Const.FAILED, "获取文章列表失败");
+        }
+        return result;
+    }
+
+    /**
+     * 获取指定联盟详情
+     * @param organizationId  机构id
+     * @return
+     */
+    @GetMapping("/findInstitutionByid")
+    public RestApiResponse<OrganizationEntity> getInstitution(@RequestParam int organizationId) {
+        RestApiResponse<OrganizationEntity> result = new RestApiResponse<OrganizationEntity>();
+        try {
+            OrganizationEntity organizationEntity = organizationService.findOne(organizationId);
+            result.successResponse(Const.SUCCESS, organizationEntity);
+        } catch (Exception e) {
+            logger.warn("获取机构详情失败", e);
+            result.failedApiResponse(Const.FAILED, "获取机构详情失败");
+        }
+        return result;
+    }
+
+    /**
+     * 数据库查询
+     * @param index  第几页
+     * @param size  每页几条
+     * @param keyword  查询值
+     * @param beginTime  开始时间
+     * @param endTime  结束时间
+     * @return
+     */
+    @GetMapping("/getDatabase")
+    public RestApiResponse<List<ArticleEntity>> getDatabase(@RequestParam(defaultValue = "0", required = false)int index,
+                                                      @RequestParam(defaultValue = "10", required = false)int size,
+                                                      @RequestParam(required = false, defaultValue = "")String keyword,
+                                                      @RequestParam(required = false, defaultValue = "")String beginTime,
+                                                      @RequestParam(required = false, defaultValue = "")String endTime) {
+        RestApiResponse<List<ArticleEntity>> result = new RestApiResponse<List<ArticleEntity>>();
+        try {
+            List<ArticleEntity> list = articleService.getDatabase(index,size, keyword, beginTime, endTime);
+            result.successResponse(Const.SUCCESS, list);
+        } catch (Exception e) {
+            logger.warn("获取数据库列表异常", e);
+            result.failedApiResponse(Const.FAILED, "获取数据库列表异常");
+        }
+        return result;
+    }
+
 }
 

@@ -22,12 +22,16 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/titleImg")
+@CrossOrigin
 public class TitleImgController {
 
     private final static Logger logger = LoggerFactory.getLogger(TitleImgController.class);
 
     @Autowired
     private TitleImgService titleImgService;
+
+    @Autowired
+    private FileUploadController fileUploadController;
 
     /**
      * 查询展示图片列表

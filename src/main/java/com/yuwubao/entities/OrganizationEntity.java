@@ -29,17 +29,17 @@ public class OrganizationEntity {
     /**
      * 单位领导
      */
-    private int lead;
-
-    /**
-     * 单位专家
-     */
-    private int expert;
+    private String lead;
 
     /**
      * 单位设置
      */
     private String institutionSetting;
+
+    /**
+     * 联系我们
+     */
+    private String contactUs;
 
     /**
      *  机构分类0(智库机构)，1(智库联盟)
@@ -50,6 +50,16 @@ public class OrganizationEntity {
      * 是否屏蔽0(不屏蔽),1(屏蔽)
      */
     private int shield;
+
+    /**
+     * 地域名
+     */
+    private String territoryName;
+
+    /**
+     * 机构类型1（大学），2（政府）
+     */
+    private int organizationType;
 
     public int getId() {
         return id;
@@ -75,20 +85,12 @@ public class OrganizationEntity {
         this.intro = intro;
     }
 
-    public int getLead() {
+    public String getLead() {
         return lead;
     }
 
-    public void setLead(int lead) {
+    public void setLead(String lead) {
         this.lead = lead;
-    }
-
-    public int getExpert() {
-        return expert;
-    }
-
-    public void setExpert(int expert) {
-        this.expert = expert;
     }
 
     public String getInstitutionSetting() {
@@ -113,5 +115,29 @@ public class OrganizationEntity {
 
     public void setShield(int shield) {
         this.shield = shield;
+    }
+
+    public String getTerritoryName() {
+        return territoryName;
+    }
+
+    public void setTerritoryName(String territoryName) {
+        this.territoryName = territoryName;
+    }
+
+    public int getOrganizationType() {
+        return organizationType;
+    }
+
+    public void setOrganizationType(int organizationType) {
+        this.organizationType = organizationType;
+    }
+
+    public String getContactUs() {
+        return contactUs;
+    }
+
+    public void setContactUs(String contactUs) {
+        this.contactUs = contactUs;
     }
 }

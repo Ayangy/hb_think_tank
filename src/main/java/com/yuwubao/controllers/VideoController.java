@@ -14,6 +14,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,6 +33,9 @@ public class VideoController {
 
     @Autowired
     private OrganizationService organizationService;
+
+    @Autowired
+    private FileUploadController fileUploadController;
 
     /**
      * 查询视频资讯
@@ -75,10 +79,11 @@ public class VideoController {
         RestApiResponse<VideoEntity> result = new RestApiResponse<VideoEntity>();
         try {
             OrganizationEntity organizationEntity = organizationService.findOne(videoEntity.getOrganizationId());
-            if (organizationEntity != null) {
+            if (organizationEntity == null) {
                 result.failedApiResponse(Const.FAILED, "指定的机构不存在");
                 return result;
             }
+            videoEntity.setCreateTime(new Date());
             VideoEntity video = videoService.add(videoEntity);
             if (video == null) {
                 result.failedApiResponse(Const.FAILED, "添加失败");
@@ -101,12 +106,14 @@ public class VideoController {
     public RestApiResponse<VideoEntity> delete(@RequestParam(required = true) int id) {
         RestApiResponse<VideoEntity> result = new RestApiResponse<VideoEntity>();
         try {
-            VideoEntity videoEntity = videoService.delete(id);
-            if (videoEntity == null) {
-                result.failedApiResponse(Const.FAILED, "该视频资讯不存在，删除失败");
+            VideoEntity entity = videoService.findOne(id);
+            if (entity == null) {
+                result.failedApiResponse(Const.FAILED, "视频资讯不存在");
                 return result;
             }
-            result.successResponse(Const.SUCCESS, videoEntity, "删除成功");
+            fileUploadController.deleteFile(entity.getVideoUrl());
+            videoService.delete(id);
+            result.successResponse(Const.SUCCESS, entity, "删除成功");
         } catch (Exception e) {
             logger.warn("删除视频资讯异常:", e);
             result.failedApiResponse(Const.FAILED, "删除视频资讯异常");
@@ -122,7 +129,7 @@ public class VideoController {
         RestApiResponse<VideoEntity> result = new RestApiResponse<VideoEntity>();
         try {
             OrganizationEntity organizationEntity = organizationService.findOne(videoEntity.getOrganizationId());
-            if (organizationEntity != null) {
+            if (organizationEntity == null) {
                 result.failedApiResponse(Const.FAILED, "指定的机构不存在");
                 return result;
             }

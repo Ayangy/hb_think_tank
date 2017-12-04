@@ -10,6 +10,7 @@ import java.util.Map;
 /**
  * Created by yangyu on 2017/10/23.
  */
+
 public interface OrganizationService {
     Page<OrganizationEntity> findAll(Map<String, String> map, Pageable pageAble);
 
@@ -28,7 +29,13 @@ public interface OrganizationService {
 
     List<OrganizationEntity> finByNameAndTypeAndShield(String query, int type, int shield);
 
-    OrganizationEntity findByName(String name);
+    List<OrganizationEntity> findByName(String name);
 
-    List<OrganizationEntity> findByCondition(Map<String, String> map, int type);
+    List<OrganizationEntity> findByCondition(Map<String, String> map, int organizationType);
+
+    List<OrganizationEntity> findByShield(int shield);
+
+    OrganizationEntity findByType(int i);
+
+    List<OrganizationEntity> findByShieldAndType(int shield, int type);
 }

@@ -37,11 +37,21 @@ public class FileUploadController {
         RestApiResponse<String> result = new RestApiResponse<String>();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         String time = sdf.format(new Date());
-        String path;
-        if (type == 0) {
-            path = resourcesPath + "\\img\\" + time + "\\";
+        String path = null;
+        String sysName = System.getProperties().getProperty("os.name");
+        String separator = System.getProperties().getProperty("file.separator");
+        if (sysName.contains("Linux")) {
+            if (type == 0) {
+                path = separator + "tmp" + separator + "img" + separator + time + separator;
+            } else {
+                path = separator + "tmp" + separator + "video" + separator + time + separator;
+            }
         } else {
-            path = resourcesPath + "\\video\\" + time + "\\";
+            if (type == 0) {
+                path = resourcesPath + separator + "img" + separator + time + separator;
+            } else {
+                path = resourcesPath + separator + "video" + separator + time + separator;
+            }
         }
         File f = new File(path);
         if (!f.exists()) {
