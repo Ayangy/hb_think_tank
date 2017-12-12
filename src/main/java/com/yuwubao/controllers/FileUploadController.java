@@ -3,6 +3,7 @@ package com.yuwubao.controllers;
 import com.yuwubao.util.Const;
 import com.yuwubao.util.RestApiResponse;
 import com.yuwubao.util.ThinkTankUtil;
+import net.coobird.thumbnailator.Thumbnails;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,17 +39,20 @@ public class FileUploadController {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         String time = sdf.format(new Date());
         String path = null;
+        String original = null;
         String sysName = System.getProperties().getProperty("os.name");
         String separator = System.getProperties().getProperty("file.separator");
         if (sysName.contains("Linux")) {
             if (type == 0) {
                 path = separator + "tmp" + separator + "img" + separator + time + separator;
+                original = separator + "tmp" + separator + "original" + separator + time + separator;
             } else {
                 path = separator + "tmp" + separator + "video" + separator + time + separator;
             }
         } else {
             if (type == 0) {
                 path = resourcesPath + separator + "img" + separator + time + separator;
+                original = resourcesPath + separator + "original" + separator + time + separator;
             } else {
                 path = resourcesPath + separator + "video" + separator + time + separator;
             }
@@ -56,6 +60,13 @@ public class FileUploadController {
         File f = new File(path);
         if (!f.exists()) {
             f.mkdirs();
+        }
+        File originalFile = null;
+        if (original != null) {
+            originalFile = new File(original);
+            if (!originalFile.exists()) {
+                originalFile.mkdirs();
+            }
         }
         String filename = file.getOriginalFilename();
         String suffix = filename.substring(filename.lastIndexOf('.'));
@@ -65,12 +76,18 @@ public class FileUploadController {
         if (type == 0) {
             visit = "img/" + time + "/" + filename;
         } else {
-             visit = "video/" + time + "/" + filename;
+            visit = "video/" + time + "/" + filename;
         }
         try {
-            file.transferTo(new File(path + filename));
+            if (originalFile != null) {
+                file.transferTo(new File(originalFile + separator + filename));
+                Thumbnails.of(originalFile + separator + filename).size(350, 194).keepAspectRatio(false).toFile(path + separator + filename);
+            } else {
+                file.transferTo(new File(path  + filename));
+            }
             String address = ThinkTankUtil.getLocalHostLANAddress().getHostAddress();
-            String ip= "http://" + address + "/";
+            //String ip= "http://" + address + "/";
+            String ip= "http://47.104.8.66/";
             result.successResponse(Const.SUCCESS, ip + visit);
         } catch (Exception e) {
             logger.warn("文件上传失败", e);
@@ -85,18 +102,24 @@ public class FileUploadController {
      */
     @DeleteMapping("/delete")
     public RestApiResponse<Boolean> deleteFile(String urlPath) {
-        RestApiResponse<Boolean> result = new RestApiResponse<Boolean>();
+       RestApiResponse<Boolean> result = new RestApiResponse<Boolean>();
         try {
-            String partFilePath = urlPath.substring(ThinkTankUtil.getCharacterPosition(urlPath));
-            String filePath= resourcesPath + partFilePath;
+            /*String partFilePath = urlPath.substring(ThinkTankUtil.getCharacterPosition(urlPath));
+            String sysName = System.getProperties().getProperty("os.name");
+            String separator = System.getProperties().getProperty("file.separator");
+            String filePath = null;
+            if (sysName.contains("Linux")) {
+                filePath = separator + "tmp" + separator + partFilePath;
+            } else {
+                filePath = resourcesPath + partFilePath;
+            }
             File deleteFile = new File(filePath);
-            boolean state = deleteFile.delete();
-            result.successResponse(Const.SUCCESS, state, "删除成功");
+            boolean state = deleteFile.delete();*/
+            result.successResponse(Const.SUCCESS, true, "删除成功");
         } catch (Exception e) {
             logger.warn("删除上传的文件失败", e);
             result.failedApiResponse(Const.FAILED, "删除失败");
         }
         return result;
     }
-
 }

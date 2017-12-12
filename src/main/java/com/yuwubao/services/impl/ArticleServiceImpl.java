@@ -136,7 +136,7 @@ public class ArticleServiceImpl implements ArticleService {
     public List<ArticleEntity> findByArticleSortAndShield(int textTypeId, int parentId, int shield, int index, int size) {
         String sql = "SELECT a.id," +
                 "a.title," +
-                " a.createdDate from article a , article_sort s where a.textTypeId = s.id AND a.shield = ?";
+                " a.addTime, a.imgUrl, a.content from article a , article_sort s where a.textTypeId = s.id AND a.shield = ?";
         if (textTypeId != 0) {
             sql += " AND a.textTypeId = " + String.valueOf(textTypeId);
         }
@@ -285,6 +285,21 @@ public class ArticleServiceImpl implements ArticleService {
         sql += " limit ?, ?";
         RowMapper<ArticleEntity> rowMapper = new BeanPropertyRowMapper<>(ArticleEntity.class);
         List<ArticleEntity> list = jdbcTemplate.query(sql, rowMapper, index, size);
+        return list;
+    }
+
+    @Override
+    public List<ArticleEntity> findByString(String query,int textTypeId, int index, int size) {
+        String sql = "SELECT * FROM article  WHERE  textTypeId = ? AND shield = 0";
+        if (StringUtils.isNotBlank(query)) {
+            sql += " and ( title LIKE '%" + query + "%'" +
+                    "OR author LIKE '%" + query +"%'" +
+                    "OR content LIKE '%" + query + "%'" +
+                    ")";
+        }
+        sql += "limit ?,?";
+        RowMapper<ArticleEntity> rowMapper = new BeanPropertyRowMapper<>(ArticleEntity.class);
+        List<ArticleEntity> list = jdbcTemplate.query(sql, rowMapper,textTypeId, index, size);
         return list;
     }
 

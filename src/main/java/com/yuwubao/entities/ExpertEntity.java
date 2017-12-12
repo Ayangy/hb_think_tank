@@ -52,6 +52,11 @@ public class ExpertEntity {
     private String research;
 
     /**
+     * 研究领域类型0党建、1 社会、2生态、3政治、4经济、5文化、6热点专题、7国际关系
+     */
+    private int fieldType;
+
+    /**
      * 教育背景
      */
     private String educational;
@@ -95,11 +100,6 @@ public class ExpertEntity {
      * 联系方式
      */
     private String contactWay;
-
-    /**
-     * 0(国内专家),1(国外专家)
-     */
-    private int type;
 
     /**
      * 是否屏蔽0(不屏蔽),1(屏蔽)
@@ -168,6 +168,14 @@ public class ExpertEntity {
 
     public void setResearch(String research) {
         this.research = research;
+    }
+
+    public int getFieldType() {
+        return fieldType;
+    }
+
+    public void setFieldType(int fieldType) {
+        this.fieldType = fieldType;
     }
 
     public String getEducational() {
@@ -240,14 +248,6 @@ public class ExpertEntity {
 
     public void setContactWay(String contactWay) {
         this.contactWay = contactWay;
-    }
-
-    public int getType() {
-        return type;
-    }
-
-    public void setType(int type) {
-        this.type = type;
     }
 
     public int getShield() {

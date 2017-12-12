@@ -109,4 +109,6 @@ public class ArticleSortServiceImpl implements ArticleSortService {
         List<ArticleSortEntity> list = jdbcTemplate.query(sql, rowMapper);
         return list;
     }
+
+
 }
