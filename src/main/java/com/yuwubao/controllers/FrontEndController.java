@@ -815,6 +815,13 @@ public class FrontEndController {
         return result;
     }
 
+    /**
+     * 条件查询文献库
+     * @param index  第几页
+     * @param size  每页几条
+     * @param literatureType  文献类型
+     * @return
+     */
     @GetMapping("/findLiteratureList")
     public RestApiResponse<List<ArticleEntity>> getLiteratureList(@RequestParam(required = false, defaultValue = "0")int index,
                                                                   @RequestParam(required = false, defaultValue = "10")int size,
