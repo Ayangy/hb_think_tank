@@ -36,8 +36,8 @@ public class FrontEndController {
     @Value("${resourcesPath}")
     private String resourcesPath;
 
-    @Value("${visitIp}")
-    private String visitIp;
+    @Value("${serverIp}")
+    private String serverIp;
 
     @Autowired
     private ArticleService articleService;
