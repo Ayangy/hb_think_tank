@@ -73,6 +73,16 @@ public class ArticleEntity implements Serializable {
      */
     private int recommend;
 
+    /**
+     * 附件
+     */
+    private String accessory;
+
+    /**
+     * 文献类型1(专家文献),2(演讲),3(著作),4(研究成果),5(调研报告),6(市场数据)
+     */
+    private int literatureType;
+
     public int getId() {
         return id;
     }
@@ -167,5 +177,21 @@ public class ArticleEntity implements Serializable {
 
     public void setRecommend(int recommend) {
         this.recommend = recommend;
+    }
+
+    public String getAccessory() {
+        return accessory;
+    }
+
+    public void setAccessory(String accessory) {
+        this.accessory = accessory;
+    }
+
+    public int getLiteratureType() {
+        return literatureType;
+    }
+
+    public void setLiteratureType(int literatureType) {
+        this.literatureType = literatureType;
     }
 }

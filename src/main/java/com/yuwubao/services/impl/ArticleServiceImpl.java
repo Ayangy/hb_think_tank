@@ -143,7 +143,7 @@ public class ArticleServiceImpl implements ArticleService {
         if (parentId != 0) {
             sql += " AND s.parentId = " + String.valueOf(parentId);
         }
-        sql += " order by a.createdDate desc LIMIT ?, ?";
+        sql += " order by a.addTime desc LIMIT ?, ?";
         RowMapper<ArticleEntity> rowMapper = new BeanPropertyRowMapper<>(ArticleEntity.class);
         List<ArticleEntity> list = jdbcTemplate.query(sql, rowMapper, shield, index, size);
         return list;
@@ -293,9 +293,9 @@ public class ArticleServiceImpl implements ArticleService {
                 "a.shield," +
                 "a.recommend FROM article a, article_sort s WHERE a.textTypeId = s.id AND s.parentId = 25 ";
         if (StringUtils.isNotBlank(beginTime)) {
-            sql += " AND a.addTime > " + beginTime;
+            sql += " AND a.addTime > '" + beginTime +"'";
             if (StringUtils.isNotBlank(endTime)) {
-                sql += " AND a.addTime <" + endTime;
+                sql += " AND a.addTime < '" + endTime + "'";
             }
         }
         if (StringUtils.isNotBlank(keyword)) {
@@ -322,6 +322,14 @@ public class ArticleServiceImpl implements ArticleService {
         sql += "limit ?,?";
         RowMapper<ArticleEntity> rowMapper = new BeanPropertyRowMapper<>(ArticleEntity.class);
         List<ArticleEntity> list = jdbcTemplate.query(sql, rowMapper,textTypeId, index, size);
+        return list;
+    }
+
+    @Override
+    public List<ArticleEntity> findLiteratureList(int index, int size, int literatureType) {
+        String sql = "SELECT * FROM article  WHERE  literatureType = ? AND shield = 0 limit ?,?";
+        RowMapper<ArticleEntity> rowMapper = new BeanPropertyRowMapper<>(ArticleEntity.class);
+        List<ArticleEntity> list = jdbcTemplate.query(sql, rowMapper,literatureType, index, size);
         return list;
     }
 

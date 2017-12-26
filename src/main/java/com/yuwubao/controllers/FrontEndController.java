@@ -2,19 +2,26 @@ package com.yuwubao.controllers;
 
 import com.yuwubao.entities.*;
 import com.yuwubao.services.*;
-import com.yuwubao.util.Const;
-import com.yuwubao.util.RestApiResponse;
-import com.yuwubao.util.ThinkTankUtil;
+import com.yuwubao.util.*;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
+import sun.misc.BASE64Encoder;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.util.*;
 
 /**
- * 前端首页数据
+ * 前端接口
  * Created by yangyu on 2017/11/6.
  */
 @RestController
@@ -25,6 +32,12 @@ public class FrontEndController {
     private final static Logger logger = LoggerFactory.getLogger(FrontEndController.class);
 
     private final static int shield = 0;//未屏蔽数据
+
+    @Value("${resourcesPath}")
+    private String resourcesPath;
+
+    @Value("${visitIp}")
+    private String visitIp;
 
     @Autowired
     private ArticleService articleService;
@@ -46,6 +59,15 @@ public class FrontEndController {
 
     @Autowired
     private BlogrollService blogrollService;
+
+    @Autowired
+    private CommentService commentService;
+
+    @Autowired
+    private ClientUserService clientUserService;
+
+    @Autowired
+    private QuestionnaireService questionnaireService;
 
     /**
      * 获取未屏蔽的最新文章
@@ -75,8 +97,7 @@ public class FrontEndController {
      * @return
      */
     @GetMapping("/findExpertByLetter")
-    public RestApiResponse<Map<String, List<ExpertEntity>>> findExpertByLetter(@RequestParam(defaultValue = "", required = false) String letter,
-                                                                               @RequestParam(defaultValue = "0", required = false) int type) {
+    public RestApiResponse<Map<String, List<ExpertEntity>>> findExpertByLetter(@RequestParam(defaultValue = "", required = false) String letter) {
         RestApiResponse<Map<String, List<ExpertEntity>>> result = new RestApiResponse<Map<String, List<ExpertEntity>>>();
         Map<String, List<ExpertEntity>> map = new HashMap<String, List<ExpertEntity>>();
         try {
@@ -202,20 +223,22 @@ public class FrontEndController {
      * 条件查询未屏蔽机构名
      * @param field 查询字段
      * @param keyword  查询值
-     * @param organizationType  1(大学),2(政府)
+     * @param organizationType  1(大学),2(党校),3(政研室),4(科研机构)
+     * @param type  0(智库机构),1(智库联盟)
      * @return
      */
     @GetMapping("/findOrganizationByCondition")
     public RestApiResponse<Map<String, List<OrganizationEntity>>> findOrganizationByCondition(@RequestParam(required = false, defaultValue = "")String field,
-                                                                             @RequestParam(required = false, defaultValue = "")String keyword,
-                                                                             @RequestParam(defaultValue = "0", required = false) int organizationType) {
+                                                                                              @RequestParam(required = false, defaultValue = "")String keyword,
+                                                                                              @RequestParam(defaultValue = "0", required = false) int organizationType,
+                                                                                              @RequestParam(defaultValue = "0", required = false) int type) {
         RestApiResponse<Map<String, List<OrganizationEntity>>> result = new RestApiResponse<Map<String, List<OrganizationEntity>>>();
         Map<String, List<OrganizationEntity>> endResult = new HashMap<String, List<OrganizationEntity>>();
         try {
             Map<String, String> map = new HashMap();
             map.put("field", field);
             map.put("keyword", keyword);
-            List<OrganizationEntity> list = organizationService.findByCondition(map, organizationType);
+            List<OrganizationEntity> list = organizationService.findByCondition(map, organizationType, type);
             List<String> letter = new ArrayList<String>();
             for (OrganizationEntity entity : list) {
                 String substring = entity.getName().substring(0, 1);
@@ -246,7 +269,7 @@ public class FrontEndController {
      * 获取本机构
      *
      */
-    @GetMapping("/getThisInstitution")
+    /*@GetMapping("/getThisInstitution")
     public RestApiResponse<OrganizationEntity> getThisInstitution(){
         RestApiResponse<OrganizationEntity> result = new RestApiResponse<OrganizationEntity>();
         try {
@@ -261,25 +284,7 @@ public class FrontEndController {
             result.failedApiResponse(Const.FAILED, "获取本机构数据异常");
         }
         return result;
-    }
-
-    /**
-     * 获取机构介绍
-     * @param id
-     * @return
-     */
-    @GetMapping("/organizationDetails")
-    public RestApiResponse<OrganizationEntity> findOrganizationByid(@RequestParam int id) {
-        RestApiResponse<OrganizationEntity> result = new RestApiResponse<OrganizationEntity>();
-        try {
-            OrganizationEntity organizationEntity = organizationService.findOne(id);
-            result.successResponse(Const.SUCCESS, organizationEntity);
-        } catch (Exception e) {
-            logger.warn("查询机构异常", e);
-            result.failedApiResponse(Const.FAILED, "查询机构异常");
-        }
-        return result;
-    }
+    }*/
 
     /**
      * 获取当前机构最新一条公告
@@ -338,11 +343,11 @@ public class FrontEndController {
 
     /**
      * 获取最新的未屏蔽视频新闻
-     * @param index  第几页
-     * @param size 每页几条
+     //* @param index  第几页
+     //* @param size 每页几条
      * @return
      */
-    @GetMapping("/findVideoNews")
+    /*@GetMapping("/findVideoNews")
     public RestApiResponse<List<VideoEntity>> getVideoNews(@RequestParam(defaultValue = "0", required = false) int index,
                                                            @RequestParam(defaultValue = "1", required = false) int size) {
         RestApiResponse<List<VideoEntity>> result = new RestApiResponse<List<VideoEntity>>();
@@ -354,7 +359,7 @@ public class FrontEndController {
             result.failedApiResponse(Const.FAILED, "视频新闻获取异常");
         }
         return result;
-    }
+    }*/
 
     @GetMapping("/getVideoDetails")
     public RestApiResponse<VideoEntity> getVideoDetails(@RequestParam int id) {
@@ -484,49 +489,13 @@ public class FrontEndController {
     }
 
     /**
-     * 注册用户
-     */
-    @PostMapping("/registeredUser")
-    public RestApiResponse<UserEntity> registeredUser(@RequestBody UserEntity userEntity,
-                                           @RequestParam(required = false, defaultValue = "1")int type) {
-        RestApiResponse<UserEntity> result = new RestApiResponse<UserEntity>();
-        try {
-            if (!StringUtils.isNotBlank(userEntity.getUsername())) {
-                result.failedApiResponse(Const.FAILED, "未设置用户名");
-                return result;
-            }
-            if (!StringUtils.isNotBlank(userEntity.getPassword())) {
-                result.failedApiResponse(Const.FAILED, "未设置密码");
-                return result;
-            }
-            UserEntity entity = userService.findByUsernameAndType(userEntity.getUsername(), type);
-            if (entity != null) {
-                result.failedApiResponse(Const.FAILED, "用户名已存在");
-                return result;
-            }
-            userEntity.setCreateTime(new Date());
-            userEntity.setType(type);
-            UserEntity user = userService.add(userEntity);
-            if (user == null) {
-                result.failedApiResponse(Const.FAILED, "添加失败");
-                return result;
-            }
-            result.successResponse(Const.SUCCESS, user, "注册成功");
-        } catch (Exception e) {
-            logger.warn("注册用户异常:", e);
-            result.failedApiResponse(Const.FAILED, "注册用户异常");
-        }
-        return result;
-    }
-
-    /**
      * 未屏蔽机构列表
      */
     @GetMapping("/getOrganizationList")
-    public RestApiResponse<List<OrganizationEntity>> getOrganizationList() {
+    public RestApiResponse<List<OrganizationEntity>> getOrganizationList(@RequestParam(required = false, defaultValue = "1")int type) {
         RestApiResponse<List<OrganizationEntity>> result = new RestApiResponse<>();
         try {
-            List<OrganizationEntity > list =  organizationService.findByShieldAndType(0,1);
+            List<OrganizationEntity > list =  organizationService.findByShieldAndType(0,type);
             result.successResponse(Const.SUCCESS, list);
         } catch (Exception e) {
             logger.warn("获取机构列表失败", e);
@@ -663,5 +632,203 @@ public class FrontEndController {
 
     }
 
+    /**
+     *  验证邮箱是否有效
+     * @param email  邮箱地址
+     * @return
+     */
+    @PostMapping("/checkEmail")
+    public RestApiResponse<Boolean> checkEmail(@RequestParam(defaultValue = "", required = false) String email) {
+        RestApiResponse<Boolean> result = new RestApiResponse<Boolean>();
+        try {
+            if (!StringUtils.isNotBlank(email)) {
+                result.failedApiResponse(Const.FAILED, "邮箱不能为空");
+                return result;
+            }
+            boolean emailState = CheckEmailValidityUtil.isEmailValid(email);
+            result.successResponse(Const.SUCCESS, emailState);
+        } catch (Exception e) {
+            logger.warn("检查邮箱异常", e);
+            result.failedApiResponse(Const.FAILED, "检查邮箱异常");
+        }
+        return result;
+    }
+
+    /**
+     * 获取验证码
+     * @throws Exception
+     */
+    @PostMapping("/getCaptcha")
+    public RestApiResponse<Map<String, Object>> getCaptcha(){
+        RestApiResponse<Map<String, Object>> result = new RestApiResponse<Map<String, Object>>();
+        try {
+            //利用图片工具生成图片
+            //第一个参数是生成的验证码，第二个参数是生成的图片
+            Object[] objs = VerifyCodeUtil.createImage();
+            String captcha = (String)objs[0];
+
+            // 图片验证码
+            ByteArrayOutputStream outputStream = null;
+            BufferedImage image = (BufferedImage) objs[1];
+
+            outputStream = new ByteArrayOutputStream();
+            ImageIO.write(image, "jpg", outputStream);
+
+            // 对字节数组Base64编码
+            BASE64Encoder encoder = new BASE64Encoder();
+
+            Map<String, Object> map = new HashMap<String, Object>();
+            map.put("img", "data:image/png;base64," + encoder.encode(outputStream.toByteArray()));
+            map.put("captcha", captcha);
+            result.successResponse(Const.SUCCESS, map);
+        } catch (Exception e) {
+            logger.warn("获取验证码异常", e);
+            result.failedApiResponse(Const.FAILED, "获取验证码异常");
+        }
+        return result;
+    }
+
+    /**
+     * 发表评论
+     * @param clientUserId  前端用户id
+     * @param articleId  文章id
+     * @param content  评论内容
+     * @return
+     */
+    @PostMapping("/makeComments")
+    public RestApiResponse<CommentEntity> makeComments(@RequestParam(required = false, defaultValue = "0") int clientUserId,
+                                                       @RequestParam int articleId,
+                                                       @RequestParam(required = false, defaultValue = "") String content) {
+        RestApiResponse<CommentEntity> result = new RestApiResponse<CommentEntity>();
+        try {
+            if (clientUserId == 0) {
+                result.failedApiResponse(Const.FAILED, "您未登录，发布评论失败");
+                return result;
+            }
+            if (!StringUtils.isNotBlank(content)) {
+                result.failedApiResponse(Const.FAILED, "评论不能为空");
+                return result;
+            }
+            ClientUserEntity clientUserEntity = clientUserService.findOne(clientUserId);
+            if (clientUserEntity == null) {
+                result.failedApiResponse(Const.FAILED, "用户不存在,评论失败");
+                return result;
+            }
+            ArticleEntity articleEntity = articleService.findById(articleId);
+            if (articleEntity == null) {
+                result.failedApiResponse(Const.FAILED, "文章不存在,评论失败");
+                return result;
+            }
+            CommentEntity comment = new CommentEntity();
+            comment.setClientUserId(clientUserId);
+            comment.setArticleId(articleId);
+            comment.setContent(content);
+            comment.setAddTime(new Date());
+            comment.setClientUserName(clientUserEntity.getName());
+            comment.setArticleTitle(articleEntity.getTitle());
+            CommentEntity commentEntity = commentService.add(comment);
+            if (commentEntity == null) {
+                result.failedApiResponse(Const.FAILED, "发表评论失败");
+                return result;
+            }
+            result.successResponse(Const.SUCCESS, commentEntity);
+        } catch (Exception e) {
+            logger.warn("添加评论异常", e);
+            result.failedApiResponse(Const.FAILED, "添加评论异常");
+        }
+        return result;
+    }
+
+    /**
+     * 获取当前文章的评论列表
+     * @param index  第几页
+     * @param size  每页几条
+     * @param articleId  文章id
+     * @return
+     */
+    @GetMapping("/getCommentList")
+    public RestApiResponse<Page<CommentEntity>> getCommentList(@RequestParam(defaultValue = "1", required = false) int index,
+                                                               @RequestParam(defaultValue = "10", required = false) int size,
+                                                               @RequestParam int articleId) {
+        RestApiResponse<Page<CommentEntity>> result = new RestApiResponse<Page<CommentEntity>>();
+        try {
+            Sort sort = new Sort(Sort.Direction.DESC, "addTime");
+            Pageable pageAble = new PageRequest(index-1, size, sort);
+            Page<CommentEntity> list = commentService.findAll(pageAble, articleId);
+            result.successResponse(Const.SUCCESS, list);
+        } catch (Exception e) {
+            logger.warn("获取评论列表异常", e);
+            result.failedApiResponse(Const.FAILED, "获取评论列表异常");
+        }
+        return result;
+    }
+
+    /**
+     * 提交调查问卷
+     * @param clientUserId  前端用户id
+     * @param articleId  文章id
+     * @param questionnaireResultUrl  问卷Url
+     * @return
+     */
+    @PostMapping("/submitQuestionnaire")
+    public RestApiResponse<QuestionnaireEntity> submitQuestionnaire(@RequestParam(required = false, defaultValue = "0") int clientUserId,
+                                                                    @RequestParam int articleId,
+                                                                    @RequestParam(required = false, defaultValue = "") String questionnaireResultUrl) {
+        RestApiResponse<QuestionnaireEntity> result = new RestApiResponse<QuestionnaireEntity>();
+        try {
+            if (clientUserId == 0) {
+                result.failedApiResponse(Const.FAILED, "您未登录,请登录再提交");
+                return result;
+            }
+            ClientUserEntity clientUserEntity = clientUserService.findOne(clientUserId);
+            if (clientUserEntity == null) {
+                result.failedApiResponse(Const.FAILED, "用户不存在,提交失败");
+                return result;
+            }
+            QuestionnaireEntity questionnaire = questionnaireService.findByClientUserId(clientUserId);
+            if (questionnaire != null) {
+                result.failedApiResponse(Const.FAILED, "您已提交问卷");
+                return result;
+            }
+            ArticleEntity articleEntity = articleService.findById(articleId);
+            if (articleEntity == null) {
+                result.failedApiResponse(Const.FAILED, "此调研话题不存在,提交失败");
+                return result;
+            }
+            if (!StringUtils.isNotBlank(questionnaireResultUrl)) {
+                result.failedApiResponse(Const.FAILED, "提交失败");
+                return result;
+            }
+            QuestionnaireEntity questionnaireEntity = new QuestionnaireEntity();
+            questionnaireEntity.setClientUserId(clientUserId);
+            questionnaireEntity.setClientUserName(clientUserEntity.getName());
+            questionnaireEntity.setArticleId(articleId);
+            questionnaireEntity.setArticleTitle(articleEntity.getTitle());
+            questionnaireEntity.setQuestionnaireResultUrl(questionnaireResultUrl);
+            questionnaireEntity.setSubmitTime(new Date());
+            QuestionnaireEntity entity = questionnaireService.save(questionnaireEntity);
+            result.successResponse(Const.SUCCESS, entity);
+        } catch (Exception e) {
+            logger.warn("提交异常", e);
+            result.failedApiResponse(Const.FAILED, "提交异常");
+        }
+        return result;
+    }
+
+    @GetMapping("/findLiteratureList")
+    public RestApiResponse<List<ArticleEntity>> getLiteratureList(@RequestParam(required = false, defaultValue = "0")int index,
+                                                                  @RequestParam(required = false, defaultValue = "10")int size,
+                                                                  @RequestParam(required = false, defaultValue = "0") int literatureType) {
+        RestApiResponse<List<ArticleEntity>> result = new RestApiResponse<List<ArticleEntity>>();
+        try {
+            List<ArticleEntity> list = articleService.findLiteratureList(index,size, literatureType);
+            result.successResponse(Const.SUCCESS,list);
+        } catch (Exception e) {
+            logger.warn("获取文献列表异常", e);
+            result.failedApiResponse(Const.FAILED, "获取文献列表异常");
+        }
+        return result;
+    }
 }
+
 
