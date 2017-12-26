@@ -269,7 +269,7 @@ public class FrontEndController {
      * 获取本机构
      *
      */
-    /*@GetMapping("/getThisInstitution")
+    @GetMapping("/getThisInstitution")
     public RestApiResponse<OrganizationEntity> getThisInstitution(){
         RestApiResponse<OrganizationEntity> result = new RestApiResponse<OrganizationEntity>();
         try {
@@ -284,7 +284,7 @@ public class FrontEndController {
             result.failedApiResponse(Const.FAILED, "获取本机构数据异常");
         }
         return result;
-    }*/
+    }
 
     /**
      * 获取当前机构最新一条公告
@@ -343,11 +343,11 @@ public class FrontEndController {
 
     /**
      * 获取最新的未屏蔽视频新闻
-     //* @param index  第几页
-     //* @param size 每页几条
+     * @param index  第几页
+     * @param size 每页几条
      * @return
      */
-    /*@GetMapping("/findVideoNews")
+    @GetMapping("/findVideoNews")
     public RestApiResponse<List<VideoEntity>> getVideoNews(@RequestParam(defaultValue = "0", required = false) int index,
                                                            @RequestParam(defaultValue = "1", required = false) int size) {
         RestApiResponse<List<VideoEntity>> result = new RestApiResponse<List<VideoEntity>>();
@@ -359,7 +359,7 @@ public class FrontEndController {
             result.failedApiResponse(Const.FAILED, "视频新闻获取异常");
         }
         return result;
-    }*/
+    }
 
     @GetMapping("/getVideoDetails")
     public RestApiResponse<VideoEntity> getVideoDetails(@RequestParam int id) {
