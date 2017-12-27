@@ -25,7 +25,7 @@ public interface OrganizationService {
 
     OrganizationEntity findOne(int id);
 
-    List<OrganizationEntity> finByLetter(String letter, int type);
+    List<OrganizationEntity> finByLetter(String letter, int type, int organizationType);
 
     List<OrganizationEntity> finByNameAndTypeAndShield(String query, int type, int shield);
 

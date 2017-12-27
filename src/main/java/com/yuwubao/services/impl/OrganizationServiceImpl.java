@@ -92,8 +92,11 @@ public class OrganizationServiceImpl implements OrganizationService{
     }
 
     @Override
-    public List<OrganizationEntity> finByLetter(String letter, int type) {
+    public List<OrganizationEntity> finByLetter(String letter, int type, int organizationType) {
         String sql = "select * from organization where get_first_pinyin_char(name) = ? AND type = ? AND shield = 0";
+        if (organizationType != 0) {
+            sql += " AND organizationType = " + organizationType;
+        }
         RowMapper<OrganizationEntity> rowMapper = new BeanPropertyRowMapper<>(OrganizationEntity.class);
         List<OrganizationEntity> list = jdbcTemplate.query(sql, rowMapper, letter, type);
         return list;

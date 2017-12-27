@@ -195,7 +195,8 @@ public class FrontEndController {
      */
     @GetMapping("/findOrganizationByLetter")
     public RestApiResponse<Map<String, List<OrganizationEntity>>> findByLetter(@RequestParam(defaultValue = "1", required = false) int type,
-                                                                  @RequestParam(defaultValue = "", required = false) String letter) {
+                                                                                @RequestParam(defaultValue = "", required = false) String letter,
+                                                                                @RequestParam(defaultValue = "0", required = false) int organizationType) {
         RestApiResponse<Map<String, List<OrganizationEntity>>> result = new RestApiResponse<Map<String, List<OrganizationEntity>>>();
         Map<String, List<OrganizationEntity>> map = new HashMap<String, List<OrganizationEntity>>();
         try {
@@ -203,13 +204,13 @@ public class FrontEndController {
                 String alphabet;
                 for (char i = 'A' ; i<= 'Z'; i++ ){
                     alphabet = String.valueOf(i);
-                    List<OrganizationEntity> list = organizationService.finByLetter(alphabet, type);
+                    List<OrganizationEntity> list = organizationService.finByLetter(alphabet, type, organizationType);
                     map.put(alphabet,list);
                 }
                 result.successResponse(Const.SUCCESS, map);
                 return result;
             }
-            List<OrganizationEntity> entities = organizationService.finByLetter(letter, type);
+            List<OrganizationEntity> entities = organizationService.finByLetter(letter, type, organizationType);
             map.put(letter, entities);
             result.successResponse(Const.SUCCESS, map);
         } catch (Exception e) {
