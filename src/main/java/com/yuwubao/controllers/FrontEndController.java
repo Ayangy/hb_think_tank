@@ -857,6 +857,12 @@ public class FrontEndController {
         }
         return result;
     }
+
+    /*@GetMapping("/retrievePwd")
+    public RestApiResponse<Boolean> retrievePwd() {
+        RestApiResponse<Boolean> result = new RestApiResponse<Boolean>();
+        return result;
+    }*/
 }
 
 
