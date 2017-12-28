@@ -75,11 +75,11 @@ public class OrganizationController {
     public RestApiResponse<OrganizationEntity> add(@RequestBody OrganizationEntity organizationEntity) {
         RestApiResponse<OrganizationEntity> result = new RestApiResponse<OrganizationEntity>();
         try {
-            List<OrganizationEntity> entity = organizationService.findByName(organizationEntity.getName());
+            /*List<OrganizationEntity> entity = organizationService.findByName(organizationEntity.getName());
             if (entity.size() > 0) {
                 result.failedApiResponse(Const.FAILED, "机构已存在");
                 return result;
-            }
+            }*/
            /* if (organizationEntity.getType() == 0) {
                 OrganizationEntity entitie = organizationService.findByType(organizationEntity.getType());
                 if (entitie != null) {
@@ -140,7 +140,7 @@ public class OrganizationController {
                 result.failedApiResponse(Const.FAILED, "修改失败，机构不存在");
                 return result;
             }
-            String oldName = organization.getName();
+            /*String oldName = organization.getName();
             if (oldName != null) {
                 if (!organization.getName().equals(organizationEntity.getName())) {
                     List<OrganizationEntity> entity = organizationService.findByName(organizationEntity.getName());
@@ -149,7 +149,7 @@ public class OrganizationController {
                         return result;
                     }
                 }
-            }
+            }*/
            /*if (organizationEntity.getType() != organization.getType() && organization.getType() != 0){
                 OrganizationEntity byType = organizationService.findByType(organizationEntity.getType());
                 if (byType != null) {
