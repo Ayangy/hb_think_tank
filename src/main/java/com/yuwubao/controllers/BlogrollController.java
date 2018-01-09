@@ -90,7 +90,8 @@ public class BlogrollController {
      * @param id 合作单位Id
      *
      */
-    @DeleteMapping("/delete")
+    //@DeleteMapping("/delete")
+    @PostMapping("/delete")
     public RestApiResponse<BlogrollEntity> delete(@RequestParam int id) {
         RestApiResponse<BlogrollEntity> result = new RestApiResponse<BlogrollEntity>();
         try {
@@ -110,7 +111,8 @@ public class BlogrollController {
     /**
      * 修改合作单位
      */
-    @PutMapping("/update")
+    @PostMapping("/update")
+   // @PutMapping("/update")
     public RestApiResponse<BlogrollEntity> update(@RequestBody BlogrollEntity blogrollEntity) {
         RestApiResponse<BlogrollEntity> result = new RestApiResponse<BlogrollEntity>();
         try {

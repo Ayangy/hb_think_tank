@@ -96,7 +96,8 @@ public class ArticleSortController {
     /**
      * 删除文章分类
      */
-    @DeleteMapping("/delete")
+    //@DeleteMapping("/delete")
+    @PostMapping("/delete")
     public RestApiResponse<ArticleSortEntity> delete(@RequestParam int id) {
         RestApiResponse<ArticleSortEntity> result = new RestApiResponse<ArticleSortEntity>();
         try {
@@ -121,7 +122,8 @@ public class ArticleSortController {
     /**
      * 修改文章分类
      */
-    @PutMapping("/update")
+    //@PutMapping("/update")
+    @PostMapping("/update")
     public RestApiResponse<ArticleSortEntity> update(@RequestBody ArticleSortEntity articleSortEntity) {
         RestApiResponse<ArticleSortEntity> result = new RestApiResponse<ArticleSortEntity>();
         try {

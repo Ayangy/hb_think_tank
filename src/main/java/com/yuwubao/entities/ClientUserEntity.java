@@ -44,7 +44,7 @@ public class ClientUserEntity {
     /**
      * 电话号码
      */
-    private int phoneNumber;
+    private String phoneNumber;
 
     /**
      * 工作单位
@@ -114,11 +114,11 @@ public class ClientUserEntity {
         this.region = region;
     }
 
-    public int getPhoneNumber() {
+    public String getPhoneNumber() {
         return phoneNumber;
     }
 
-    public void setPhoneNumber(int phoneNumber) {
+    public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
 

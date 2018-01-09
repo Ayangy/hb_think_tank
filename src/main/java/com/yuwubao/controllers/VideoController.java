@@ -103,7 +103,8 @@ public class VideoController {
      * @param id  视频资讯Id
      * @return
      */
-    @DeleteMapping("/delete")
+    //@DeleteMapping("/delete")
+    @PostMapping("/delete")
     public RestApiResponse<VideoEntity> delete(@RequestParam(required = true) int id) {
         RestApiResponse<VideoEntity> result = new RestApiResponse<VideoEntity>();
         try {
@@ -127,7 +128,8 @@ public class VideoController {
     /**
      * 修改视频资讯
      */
-    @PutMapping("/update")
+    //@PutMapping("/update")
+    @PostMapping("/update")
     public RestApiResponse<VideoEntity> update(@RequestBody VideoEntity videoEntity) {
         RestApiResponse<VideoEntity> result = new RestApiResponse<VideoEntity>();
         try {

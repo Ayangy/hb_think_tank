@@ -105,7 +105,8 @@ public class OrganizationController {
      * @param id  机构Id
      * @return
      */
-    @DeleteMapping("/delete")
+    //@DeleteMapping("/delete")
+    @PostMapping("/delete")
     public RestApiResponse<OrganizationEntity> delete(@RequestParam(required = true) int id) {
         RestApiResponse<OrganizationEntity> result = new RestApiResponse<OrganizationEntity>();
         try {
@@ -131,7 +132,8 @@ public class OrganizationController {
     /**
      * 修改机构
      */
-    @PutMapping("/update")
+    //@PutMapping("/update")
+    @PostMapping("/update")
     public RestApiResponse<OrganizationEntity> update(@RequestBody OrganizationEntity organizationEntity) {
         RestApiResponse<OrganizationEntity> result = new RestApiResponse<OrganizationEntity>();
         try {

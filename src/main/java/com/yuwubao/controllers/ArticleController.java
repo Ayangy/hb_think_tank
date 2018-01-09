@@ -126,7 +126,8 @@ public class ArticleController {
      * @param id 文章Id
      *
      */
-    @DeleteMapping("/delete")
+    //@DeleteMapping("/delete")
+    @PostMapping("/delete")
     public RestApiResponse<ArticleEntity> delete(@RequestParam int id) {
         RestApiResponse<ArticleEntity> result = new RestApiResponse<ArticleEntity>();
         try {
@@ -150,7 +151,8 @@ public class ArticleController {
     /**
      * 修改文章
      */
-    @PutMapping("/update")
+    //@PutMapping("/update")
+    @PostMapping("/update")
     public RestApiResponse<ArticleEntity> update(@RequestBody ArticleEntity articleEntity) {
         RestApiResponse<ArticleEntity> result = new RestApiResponse<ArticleEntity>();
         try {

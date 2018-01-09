@@ -4,6 +4,7 @@ import org.apache.commons.net.smtp.SMTPClient;
 import org.apache.commons.net.smtp.SMTPReply;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.xbill.DNS.Lookup;
 import org.xbill.DNS.Record;
 import org.xbill.DNS.Type;
@@ -16,6 +17,9 @@ import java.io.IOException;
 public class CheckEmailValidityUtil {
 
     private final static Logger logger = LoggerFactory.getLogger(CheckEmailValidityUtil.class);
+
+    @Value("${myEmailAccount}")
+    private static String myEmailAccount;
 
     /**
      * @param email 待校验的邮箱地址
@@ -68,14 +72,11 @@ public class CheckEmailValidityUtil {
                 }
             }
             logger.info("SMTPClient ReplyString:"+client.getReplyString());
-            String emailSuffix="163.com";
-            String emailPrefix="ranguisheng";
-            String fromEmail = emailPrefix+"@"+emailSuffix;
             //Login to the SMTP server by sending the HELO command with the given hostname as an argument.
             //Before performing any mail commands, you must first login.
             //尝试和SMTP服务器建立连接,发送一条消息给SMTP服务器
-            client.login(emailPrefix);
-            logger.info("SMTPClient login:"+emailPrefix+"...");
+            client.login(myEmailAccount);
+            logger.info("SMTPClient login:"+myEmailAccount+"...");
             logger.info("SMTPClient ReplyString:"+client.getReplyString());
 
             //Set the sender of a message using the SMTP MAIL command,
@@ -83,8 +84,8 @@ public class CheckEmailValidityUtil {
             //The sender must be set first before any recipients may be specified,
             //otherwise the mail server will reject your commands.
             //设置发送者，在设置接受者之前必须要先设置发送者
-            client.setSender(fromEmail);
-            logger.info("设置发送者 :"+fromEmail);
+            client.setSender(myEmailAccount);
+            logger.info("设置发送者 :"+myEmailAccount);
             logger.info("SMTPClient ReplyString:"+client.getReplyString());
 
             //Add a recipient for a message using the SMTP RCPT command,

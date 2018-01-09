@@ -94,7 +94,8 @@ public class RoleController {
      * @param id  角色Id
      * @return
      */
-    @DeleteMapping("/delete")
+    //@DeleteMapping("/delete")
+    @PostMapping("/delete")
     public RestApiResponse<RoleEntity> delete(@RequestParam(required = true) int id) {
         RestApiResponse<RoleEntity> result = new RestApiResponse<RoleEntity>();
         try {
@@ -114,7 +115,8 @@ public class RoleController {
     /**
      * 修改角色
      */
-    @PutMapping("/update")
+    //@PutMapping("/update")
+    @PostMapping("/update")
     public RestApiResponse<RoleEntity> update(@RequestBody RoleEntity roleEntity) {
         RestApiResponse<RoleEntity> result = new RestApiResponse<RoleEntity>();
         try {

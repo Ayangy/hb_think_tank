@@ -122,7 +122,8 @@ public class UserController {
      * @param id  用户Id
      * @return
      */
-    @DeleteMapping("/delete")
+    //@DeleteMapping("/delete")
+    @PostMapping("/delete")
     public RestApiResponse<UserEntity> delete(@RequestParam(required = true) int id) {
         RestApiResponse<UserEntity> result = new RestApiResponse<UserEntity>();
         try {
@@ -142,7 +143,8 @@ public class UserController {
     /**
      * 修改用户
      */
-    @PutMapping("/update")
+    //@PutMapping("/update")
+    @PostMapping("/update")
     public RestApiResponse<UserEntity> update(@RequestBody UserEntity userEntity) {
         RestApiResponse<UserEntity> result = new RestApiResponse<UserEntity>();
         try {
