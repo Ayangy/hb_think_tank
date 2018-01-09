@@ -89,7 +89,8 @@ public class TitleImgController {
      * @param id  图片Id
      * @return
      */
-    @DeleteMapping("/delete")
+    //@DeleteMapping("/delete")
+    @PostMapping("/delete")
     public RestApiResponse<TitleImgEntity> delete(@RequestParam(required = true) int id) {
         RestApiResponse<TitleImgEntity> result = new RestApiResponse<TitleImgEntity>();
         try {
@@ -112,7 +113,8 @@ public class TitleImgController {
     /**
      * 修改展示图片
      */
-    @PutMapping("/update")
+    //@PutMapping("/update")
+    @PostMapping("/update")
     public RestApiResponse<TitleImgEntity> update(@RequestBody TitleImgEntity titleImgEntity) {
         RestApiResponse<TitleImgEntity> result = new RestApiResponse<TitleImgEntity>();
         try {

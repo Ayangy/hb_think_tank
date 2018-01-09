@@ -97,7 +97,8 @@ public class ExpertController {
      * @param id  专家Id
      * @return
      */
-    @DeleteMapping("/delete")
+    //@DeleteMapping("/delete")
+    @PostMapping("/delete")
     public RestApiResponse<ExpertEntity> delete(@RequestParam(required = true) int id) {
         RestApiResponse<ExpertEntity> result = new RestApiResponse<ExpertEntity>();
         try {
@@ -121,7 +122,8 @@ public class ExpertController {
     /**
      * 修改专家
      */
-    @PutMapping("/update")
+    //@PutMapping("/update")
+    @PostMapping("/update")
     public RestApiResponse<ExpertEntity> update(@RequestBody ExpertEntity expertEntity) {
         RestApiResponse<ExpertEntity> result = new RestApiResponse<ExpertEntity>();
         try {

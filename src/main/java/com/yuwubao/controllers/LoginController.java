@@ -87,7 +87,7 @@ public class LoginController {
                 result.failedApiResponse(Const.FAILED, "账号未激活");
                 return result;
             }
-            result.successResponse(Const.SUCCESS, clientUserEntity);
+            result.successResponse(Const.SUCCESS, clientUserEntity, "登录成功");
         } catch (Exception e) {
             logger.warn("登录异常", e);
             result.failedApiResponse(Const.FAILED, "登录异常");

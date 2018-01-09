@@ -128,8 +128,10 @@ public class ExpertServiceImpl implements ExpertService {
                 }
                 Path<Integer> path = root.get("shield");
                 predict.getExpressions().add(criteriaBuilder.equal(path, String.valueOf(0)));
-                Path<Integer> path1 = root.get("fieldType");
-                predict.getExpressions().add(criteriaBuilder.equal(path1, String.valueOf(fieldType)));
+                if (fieldType >= 0) {
+                    Path<Integer> path1 = root.get("fieldType");
+                    predict.getExpressions().add(criteriaBuilder.equal(path1, String.valueOf(fieldType)));
+                }
                 return predict;
             }
         };

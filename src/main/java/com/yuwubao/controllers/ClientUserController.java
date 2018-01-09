@@ -2,6 +2,7 @@ package com.yuwubao.controllers;
 
 import com.yuwubao.entities.ClientUserEntity;
 import com.yuwubao.services.ClientUserService;
+import com.yuwubao.util.CheckEmailValidityUtil;
 import com.yuwubao.util.Const;
 import com.yuwubao.util.MD5;
 import com.yuwubao.util.RestApiResponse;
@@ -49,10 +50,15 @@ public class ClientUserController {
     /**
      * 注册用户
      */
-    @PostMapping("/registeredUser")
+    @PostMapping(value = "/registeredUser",consumes="application/json;charset=UTF-8")
     public RestApiResponse<Boolean> registeredUser(@RequestBody ClientUserEntity clientUserEntity) {
         RestApiResponse<Boolean> result = new RestApiResponse<Boolean>();
         try {
+            /*boolean emailValid = CheckEmailValidityUtil.isEmailValid(clientUserEntity.getEmail());
+            if(emailValid){
+                result.failedApiResponse(Const.FAILED, "注册失败,请检查邮箱是否书写正确");
+                return result;
+            }*/
             ClientUserEntity clientUser = clientUserService.findByEmail(clientUserEntity.getEmail());
             if (clientUser != null) {
                 result.failedApiResponse(Const.FAILED, "已使用此邮箱注册");
@@ -95,7 +101,7 @@ public class ClientUserController {
                 //邮件正文
                 message.setContent("您好：\n" +
                         "感谢您注册湖北智库网，点击或复制到浏览器打开下方链接，激活您的账号"+
-                        "<a href='http://" + serverIp + ":8080/clientUser/activateUser?id=" + clientUserEntity.getId() + "&ActivationCode=" +clientUserEntity.getActivationCode()+" _act='check_domail'>http://" + serverIp + ":8080/clientUser/activateUser?id="+ clientUserEntity.getId() +"&ActivationCode=" +clientUserEntity.getActivationCode()+ "</a>",
+                        "<a href='http://" + serverIp + ":8080/clientUser/activateUser?id=" + clientUserEntity.getId() + "&ActivationCode=" +clientUserEntity.getActivationCode()+"' _act='check_domail'>http://" + serverIp + ":8080/clientUser/activateUser?id="+ clientUserEntity.getId() +"&ActivationCode=" +clientUserEntity.getActivationCode()+ "</a>",
                         "text/html;charset=UTF-8");
 
                 //设置发件时间
@@ -109,14 +115,14 @@ public class ClientUserController {
                 transport.connect(myEmailAccount, myEmailPwd);
                 transport.sendMessage(message, message.getAllRecipients());
                 transport.close();
-                result.successResponse(Const.SUCCESS, true, "注册成功");
+                result.successResponse(Const.SUCCESS, true, "注册成功,请到邮箱激活!");
                 return result;
             }
             result.failedApiResponse(Const.FAILED, "注册失败");
             return result;
         } catch (Exception e) {
             logger.warn("注册异常", e);
-            result.failedApiResponse(Const.FAILED, "注册异常");
+            result.failedApiResponse(Const.ERROR, "注册异常");
         }
         return result;
     }
