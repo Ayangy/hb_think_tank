@@ -43,7 +43,7 @@ public class QuestionnaireEntity {
     private Date submitTime;
 
     /**
-     * 调查问卷结果Url
+     * 调查问卷Url
      */
     private String QuestionnaireResultUrl;
 

@@ -1,6 +1,7 @@
 package com.yuwubao.entities;
 
 import javax.persistence.*;
+import java.util.Date;
 
 /**
  * Created by yangyu on 2017/11/3.
@@ -9,102 +10,73 @@ import javax.persistence.*;
 @Entity
 @Table( name = "zk_expert")
 public class ExpertEntity {
+
     /**
      * 主键、自增长
      */
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
-
     /**
-     * 专家照片
+     *  头像
      */
     private String img;
-
     /**
-     * 专家姓名
+     *  姓名
      */
     private String name;
-
     /**
-     * 专家职位
+     *  性别
      */
-    private String position;
-
+    private String sex;
     /**
-     *  所属机构Id
+     *  籍贯
      */
-    private int organizationId;
-
+    private String nativePlace;
     /**
-     * 机构名
+     *  出生日期
      */
-    private String organizationName;
-
+    private Date dateOfBirth;
     /**
-     *  个人简历
+     *  职称
+     */
+    private String jobTitle;
+    /**
+     *  职务
+     */
+    private String duty;
+    /**
+     *  专家称号
+     */
+    private String expertsTitles;
+    /**
+     *  所在单位
+     */
+    private String company;
+    /**
+     *  学历
+     */
+    private String education;
+    /**
+     *  学位
+     */
+    private String degree;
+    /**
+     *  简历
      */
     private String resume;
-
     /**
-     * 研究领域
+     *  研究领域
      */
-    private String research;
-
+    private String researchField;
     /**
-     * 研究领域类型0党建、1 社会、2生态、3政治、4经济、5文化、6热点专题、7国际关系
+     *  决策咨询成果
      */
-    private int fieldType;
-
+    private String decisionConsultingResult;
     /**
-     * 教育背景
+     *  学术成果
      */
-    private String educational;
-
-    /**
-     * 内部报告
-     */
-    private String report;
-
-    /**
-     * 学术论文
-     */
-    private String academicPaper;
-
-    /**
-     * 学术著作
-     */
-    private String composition;
-
-    /**
-     * 研究项目
-     */
-    private String researchProject;
-
-    /**
-     * 学术兼职
-     */
-    private String partTimeJob;
-
-    /**
-     * 社会荣誉
-     */
-    private String socialPrestige;
-
-    /**
-     * 研究成果
-     */
-    private String researchResult;
-
-    /**
-     * 联系方式
-     */
-    private String contactWay;
-
-    /**
-     * 是否屏蔽0(不屏蔽),1(屏蔽)
-     */
-    private int shield;
+    private String academicWorks;
 
     public int getId() {
         return id;
@@ -130,28 +102,76 @@ public class ExpertEntity {
         this.name = name;
     }
 
-    public String getPosition() {
-        return position;
+    public String getSex() {
+        return sex;
     }
 
-    public void setPosition(String position) {
-        this.position = position;
+    public void setSex(String sex) {
+        this.sex = sex;
     }
 
-    public int getOrganizationId() {
-        return organizationId;
+    public String getNativePlace() {
+        return nativePlace;
     }
 
-    public void setOrganizationId(int organizationId) {
-        this.organizationId = organizationId;
+    public void setNativePlace(String nativePlace) {
+        this.nativePlace = nativePlace;
     }
 
-    public String getOrganizationName() {
-        return organizationName;
+    public Date getDateOfBirth() {
+        return dateOfBirth;
     }
 
-    public void setOrganizationName(String organizationName) {
-        this.organizationName = organizationName;
+    public void setDateOfBirth(Date dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
+    }
+
+    public String getJobTitle() {
+        return jobTitle;
+    }
+
+    public void setJobTitle(String jobTitle) {
+        this.jobTitle = jobTitle;
+    }
+
+    public String getDuty() {
+        return duty;
+    }
+
+    public void setDuty(String duty) {
+        this.duty = duty;
+    }
+
+    public String getExpertsTitles() {
+        return expertsTitles;
+    }
+
+    public void setExpertsTitles(String expertsTitles) {
+        this.expertsTitles = expertsTitles;
+    }
+
+    public String getCompany() {
+        return company;
+    }
+
+    public void setCompany(String company) {
+        this.company = company;
+    }
+
+    public String getEducation() {
+        return education;
+    }
+
+    public void setEducation(String education) {
+        this.education = education;
+    }
+
+    public String getDegree() {
+        return degree;
+    }
+
+    public void setDegree(String degree) {
+        this.degree = degree;
     }
 
     public String getResume() {
@@ -162,99 +182,27 @@ public class ExpertEntity {
         this.resume = resume;
     }
 
-    public String getResearch() {
-        return research;
+    public String getResearchField() {
+        return researchField;
     }
 
-    public void setResearch(String research) {
-        this.research = research;
+    public void setResearchField(String researchField) {
+        this.researchField = researchField;
     }
 
-    public int getFieldType() {
-        return fieldType;
+    public String getDecisionConsultingResult() {
+        return decisionConsultingResult;
     }
 
-    public void setFieldType(int fieldType) {
-        this.fieldType = fieldType;
+    public void setDecisionConsultingResult(String decisionConsultingResult) {
+        this.decisionConsultingResult = decisionConsultingResult;
     }
 
-    public String getEducational() {
-        return educational;
+    public String getAcademicWorks() {
+        return academicWorks;
     }
 
-    public void setEducational(String educational) {
-        this.educational = educational;
-    }
-
-    public String getReport() {
-        return report;
-    }
-
-    public void setReport(String report) {
-        this.report = report;
-    }
-
-    public String getAcademicPaper() {
-        return academicPaper;
-    }
-
-    public void setAcademicPaper(String academicPaper) {
-        this.academicPaper = academicPaper;
-    }
-
-    public String getComposition() {
-        return composition;
-    }
-
-    public void setComposition(String composition) {
-        this.composition = composition;
-    }
-
-    public String getResearchProject() {
-        return researchProject;
-    }
-
-    public void setResearchProject(String researchProject) {
-        this.researchProject = researchProject;
-    }
-
-    public String getPartTimeJob() {
-        return partTimeJob;
-    }
-
-    public void setPartTimeJob(String partTimeJob) {
-        this.partTimeJob = partTimeJob;
-    }
-
-    public String getSocialPrestige() {
-        return socialPrestige;
-    }
-
-    public void setSocialPrestige(String socialPrestige) {
-        this.socialPrestige = socialPrestige;
-    }
-
-    public String getResearchResult() {
-        return researchResult;
-    }
-
-    public void setResearchResult(String researchResult) {
-        this.researchResult = researchResult;
-    }
-
-    public String getContactWay() {
-        return contactWay;
-    }
-
-    public void setContactWay(String contactWay) {
-        this.contactWay = contactWay;
-    }
-
-    public int getShield() {
-        return shield;
-    }
-
-    public void setShield(int shield) {
-        this.shield = shield;
+    public void setAcademicWorks(String academicWorks) {
+        this.academicWorks = academicWorks;
     }
 }
