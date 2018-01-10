@@ -1,8 +1,12 @@
 package com.yuwubao.controllers;
 
+import com.yuwubao.entities.OperationNoteEntity;
 import com.yuwubao.entities.OrganizationEntity;
+import com.yuwubao.entities.UserEntity;
 import com.yuwubao.entities.VideoEntity;
+import com.yuwubao.services.OperationNoteService;
 import com.yuwubao.services.OrganizationService;
+import com.yuwubao.services.UserService;
 import com.yuwubao.services.VideoService;
 import com.yuwubao.util.Const;
 import com.yuwubao.util.RestApiResponse;
@@ -37,6 +41,12 @@ public class VideoController {
 
     @Autowired
     private FileUploadController fileUploadController;
+
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private OperationNoteService operationNoteService;
 
     /**
      * 查询视频资讯
@@ -76,7 +86,7 @@ public class VideoController {
      * 新增视频资讯
      */
     @PostMapping("/add")
-    public RestApiResponse<VideoEntity> add(@RequestBody VideoEntity videoEntity) {
+    public RestApiResponse<VideoEntity> add(@RequestBody VideoEntity videoEntity, @RequestParam int userId) {
         RestApiResponse<VideoEntity> result = new RestApiResponse<VideoEntity>();
         try {
             OrganizationEntity organizationEntity = organizationService.findOne(videoEntity.getOrganizationId());
@@ -90,6 +100,17 @@ public class VideoController {
                 result.failedApiResponse(Const.FAILED, "添加失败");
                 return result;
             }
+
+            //保存当前用户的操作记录
+            UserEntity loginUserEntity = userService.findById(userId);
+
+            OperationNoteEntity noteEntity = new OperationNoteEntity();
+            noteEntity.setUserName(loginUserEntity.getUsername());
+            noteEntity.setOperationLog(loginUserEntity.getUsername()+"新增音视频:" + video.getTitle());
+            noteEntity.setOperationTime(new Date());
+
+            operationNoteService.save(noteEntity);
+
             result.successResponse(Const.SUCCESS, video, "添加成功");
         } catch (Exception e) {
             logger.warn("新增视频资讯异常:", e);
@@ -105,7 +126,7 @@ public class VideoController {
      */
     //@DeleteMapping("/delete")
     @PostMapping("/delete")
-    public RestApiResponse<VideoEntity> delete(@RequestParam(required = true) int id) {
+    public RestApiResponse<VideoEntity> delete(@RequestParam(required = true) int id, @RequestParam int userId) {
         RestApiResponse<VideoEntity> result = new RestApiResponse<VideoEntity>();
         try {
             VideoEntity entity = videoService.findOne(id);
@@ -116,7 +137,18 @@ public class VideoController {
             if (StringUtils.isNotBlank(entity.getVideoUrl())) {
                 fileUploadController.deleteFile(entity.getVideoUrl());
             }
-            videoService.delete(id);
+            VideoEntity videoEntity = videoService.delete(id);
+
+            //保存当前用户的操作记录
+            UserEntity loginUserEntity = userService.findById(userId);
+
+            OperationNoteEntity noteEntity = new OperationNoteEntity();
+            noteEntity.setUserName(loginUserEntity.getUsername());
+            noteEntity.setOperationLog(loginUserEntity.getUsername()+"删除音视频:" + videoEntity.getTitle());
+            noteEntity.setOperationTime(new Date());
+
+            operationNoteService.save(noteEntity);
+
             result.successResponse(Const.SUCCESS, entity, "删除成功");
         } catch (Exception e) {
             logger.warn("删除视频资讯异常:", e);
@@ -130,7 +162,7 @@ public class VideoController {
      */
     //@PutMapping("/update")
     @PostMapping("/update")
-    public RestApiResponse<VideoEntity> update(@RequestBody VideoEntity videoEntity) {
+    public RestApiResponse<VideoEntity> update(@RequestBody VideoEntity videoEntity, @RequestParam int userId) {
         RestApiResponse<VideoEntity> result = new RestApiResponse<VideoEntity>();
         try {
             OrganizationEntity organizationEntity = organizationService.findOne(videoEntity.getOrganizationId());
@@ -144,6 +176,17 @@ public class VideoController {
                 return result;
             }
             VideoEntity video = videoService.update(videoEntity);
+
+            //保存当前用户的操作记录
+            UserEntity loginUserEntity = userService.findById(userId);
+
+            OperationNoteEntity noteEntity = new OperationNoteEntity();
+            noteEntity.setUserName(loginUserEntity.getUsername());
+            noteEntity.setOperationLog(loginUserEntity.getUsername()+"修改音视频:" + video.getTitle());
+            noteEntity.setOperationTime(new Date());
+
+            operationNoteService.save(noteEntity);
+
             result.successResponse(Const.SUCCESS, video, "修改成功");
         } catch (Exception e) {
             logger.warn("修改视频资讯异常", e);

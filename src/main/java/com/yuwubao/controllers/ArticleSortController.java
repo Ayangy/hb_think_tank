@@ -2,8 +2,12 @@ package com.yuwubao.controllers;
 
 import com.yuwubao.entities.ArticleEntity;
 import com.yuwubao.entities.ArticleSortEntity;
+import com.yuwubao.entities.OperationNoteEntity;
+import com.yuwubao.entities.UserEntity;
 import com.yuwubao.services.ArticleService;
 import com.yuwubao.services.ArticleSortService;
+import com.yuwubao.services.OperationNoteService;
+import com.yuwubao.services.UserService;
 import com.yuwubao.util.Const;
 import com.yuwubao.util.RestApiResponse;
 import org.slf4j.Logger;
@@ -15,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +40,12 @@ public class ArticleSortController {
 
     @Autowired
     private ArticleService articleService;
+
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private OperationNoteService operationNoteService;
 
     /**
      * 查询文章分类
@@ -69,7 +80,7 @@ public class ArticleSortController {
      * 新增文章分类
      */
     @PostMapping("/add")
-    public RestApiResponse<ArticleSortEntity> add(@RequestBody ArticleSortEntity articleSortEntity) {
+    public RestApiResponse<ArticleSortEntity> add(@RequestBody ArticleSortEntity articleSortEntity, @RequestParam int userId) {
         RestApiResponse<ArticleSortEntity> result = new RestApiResponse<ArticleSortEntity>();
         try {
             int parentId = articleSortEntity.getParentId();
@@ -85,6 +96,17 @@ public class ArticleSortController {
                 result.failedApiResponse(Const.FAILED, "添加失败");
                 return result;
             }
+
+            //保存当前用户的操作记录
+            UserEntity userEntity = userService.findById(userId);
+
+            OperationNoteEntity noteEntity = new OperationNoteEntity();
+            noteEntity.setUserName(userEntity.getUsername());
+            noteEntity.setOperationLog(userEntity.getUsername()+"新增了文章类型:" + articleSort.getName());
+            noteEntity.setOperationTime(new Date());
+
+            operationNoteService.save(noteEntity);
+
             result.successResponse(Const.SUCCESS, articleSort, "添加成功");
         } catch (Exception e) {
             logger.warn("新增文章分类异常", e);
@@ -98,7 +120,7 @@ public class ArticleSortController {
      */
     //@DeleteMapping("/delete")
     @PostMapping("/delete")
-    public RestApiResponse<ArticleSortEntity> delete(@RequestParam int id) {
+    public RestApiResponse<ArticleSortEntity> delete(@RequestParam int id, @RequestParam int userId) {
         RestApiResponse<ArticleSortEntity> result = new RestApiResponse<ArticleSortEntity>();
         try {
             List<ArticleEntity> articleList = articleService.findByTextTypeId(id);
@@ -106,9 +128,27 @@ public class ArticleSortController {
                 result.failedApiResponse(Const.FAILED, "此类文章未删净，删除失败");
                 return result;
             }
+            ArticleSortEntity sortEntity = articleSortService.findById(id);
+            if (sortEntity == null) {
+                result.failedApiResponse(Const.FAILED, "删除的文章分类不存在");
+                return result;
+            }
+            //保存当前用户的操作记录
+            UserEntity userEntity = userService.findById(userId);
+            OperationNoteEntity noteEntity = new OperationNoteEntity();
+            if (sortEntity.getParentId() > 0) {
+                ArticleSortEntity parentSort = articleSortService.findById(sortEntity.getParentId());
+                noteEntity.setOperationLog(userEntity.getUsername() + "删除一级文章类型【" + parentSort.getName() + "】下的子类型【" + sortEntity.getName() + "】");
+            } else {
+                noteEntity.setOperationLog(userEntity.getUsername() + "删除一级文章类型【" + sortEntity.getName() + "】");
+            }
+            noteEntity.setUserName(userEntity.getUsername());
+            noteEntity.setOperationTime(new Date());
+            operationNoteService.save(noteEntity);
+
             ArticleSortEntity articleSort = articleSortService.delete(id);
             if (articleSort == null) {
-                result.failedApiResponse(Const.FAILED, "删除失败,分类不存在");
+                result.failedApiResponse(Const.FAILED, "删除失败");
                 return result;
             }
             result.successResponse(Const.SUCCESS, articleSort, "删除成功");
@@ -124,12 +164,32 @@ public class ArticleSortController {
      */
     //@PutMapping("/update")
     @PostMapping("/update")
-    public RestApiResponse<ArticleSortEntity> update(@RequestBody ArticleSortEntity articleSortEntity) {
+    public RestApiResponse<ArticleSortEntity> update(@RequestBody ArticleSortEntity articleSortEntity, @RequestParam int userId) {
         RestApiResponse<ArticleSortEntity> result = new RestApiResponse<ArticleSortEntity>();
         try {
+            ArticleSortEntity sortEntity = articleSortService.findById(articleSortEntity.getId());
+            if (sortEntity == null) {
+                result.failedApiResponse(Const.FAILED, "修改的类型不存在");
+                return result;
+            }
+
+            if (!sortEntity.getName().equals(articleSortEntity.getName())) {
+                //保存当前用户的操作记录
+                UserEntity userEntity = userService.findById(userId);
+                OperationNoteEntity noteEntity = new OperationNoteEntity();
+                if (articleSortEntity.getParentId() > 0) {
+                    ArticleSortEntity parentSort = articleSortService.findById(articleSortEntity.getParentId());
+                    noteEntity.setOperationLog(userEntity.getUsername() + "修改一级文章类型【"+ parentSort.getName() +"】下的子类型【" + sortEntity.getName() + "】为【" + articleSortEntity.getName() + "】");
+                } else {
+                    noteEntity.setOperationLog(userEntity.getUsername() + "修改一级文章类型【" + sortEntity.getName() + "】为【" + articleSortEntity.getName() + "】");
+                }
+                noteEntity.setUserName(userEntity.getUsername());
+                noteEntity.setOperationTime(new Date());
+                operationNoteService.save(noteEntity);
+            }
             ArticleSortEntity articleSort = articleSortService.update(articleSortEntity);
             if (articleSort == null) {
-                result.failedApiResponse(Const.FAILED, "修改失败，分类不存在");
+                result.failedApiResponse(Const.FAILED, "修改失败");
                 return result;
             }
             result.successResponse(Const.SUCCESS, articleSort, "修改成功");

@@ -29,6 +29,11 @@ public class ArticleEntity implements Serializable {
     private String author;
 
     /**
+     * 来源
+     */
+    private String source;
+
+    /**
      * 创作时间
      */
     private Date createdDate;
@@ -105,6 +110,14 @@ public class ArticleEntity implements Serializable {
 
     public void setAuthor(String author) {
         this.author = author;
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
     }
 
     public Date getCreatedDate() {

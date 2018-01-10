@@ -1,10 +1,10 @@
 package com.yuwubao.controllers;
 
 import com.yuwubao.entities.ArticleEntity;
+import com.yuwubao.entities.OperationNoteEntity;
 import com.yuwubao.entities.OrganizationEntity;
-import com.yuwubao.services.ArticleService;
-import com.yuwubao.services.ExpertService;
-import com.yuwubao.services.OrganizationService;
+import com.yuwubao.entities.UserEntity;
+import com.yuwubao.services.*;
 import com.yuwubao.util.Const;
 import com.yuwubao.util.RestApiResponse;
 import org.slf4j.Logger;
@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +40,12 @@ public class OrganizationController {
 
     @Autowired
     private ExpertService expertService;
+
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private OperationNoteService operationNoteService;
 
     /**
      * 查询机构列表
@@ -72,7 +79,7 @@ public class OrganizationController {
      * 新增机构
      */
     @PostMapping("/add")
-    public RestApiResponse<OrganizationEntity> add(@RequestBody OrganizationEntity organizationEntity) {
+    public RestApiResponse<OrganizationEntity> add(@RequestBody OrganizationEntity organizationEntity, @RequestParam int userId) {
         RestApiResponse<OrganizationEntity> result = new RestApiResponse<OrganizationEntity>();
         try {
             /*List<OrganizationEntity> entity = organizationService.findByName(organizationEntity.getName());
@@ -92,6 +99,16 @@ public class OrganizationController {
                 result.failedApiResponse(Const.FAILED, "添加机构失败");
                 return result;
             }
+
+            //保存当前用户的操作记录
+            UserEntity userEntity = userService.findById(userId);
+
+            OperationNoteEntity noteEntity = new OperationNoteEntity();
+            noteEntity.setUserName(userEntity.getUsername());
+            noteEntity.setOperationLog(userEntity.getUsername()+"新增智库机构:" + organization.getName());
+            noteEntity.setOperationTime(new Date());
+
+            operationNoteService.save(noteEntity);
             result.successResponse(Const.SUCCESS, organization, "添加机构成功");
         } catch (Exception e) {
             logger.warn("新增机构异常", e);
@@ -107,7 +124,7 @@ public class OrganizationController {
      */
     //@DeleteMapping("/delete")
     @PostMapping("/delete")
-    public RestApiResponse<OrganizationEntity> delete(@RequestParam(required = true) int id) {
+    public RestApiResponse<OrganizationEntity> delete(@RequestParam(required = true) int id, @RequestParam int userId) {
         RestApiResponse<OrganizationEntity> result = new RestApiResponse<OrganizationEntity>();
         try {
             List<ArticleEntity> articleList = articleService.findByOrganizationId(id);
@@ -121,6 +138,16 @@ public class OrganizationController {
                 result.failedApiResponse(Const.FAILED, "该机构不存在，删除失败");
                 return result;
             }
+
+            //保存当前用户的操作记录
+            UserEntity userEntity = userService.findById(userId);
+
+            OperationNoteEntity noteEntity = new OperationNoteEntity();
+            noteEntity.setUserName(userEntity.getUsername());
+            noteEntity.setOperationLog(userEntity.getUsername()+"删除智库机构:" + organizationEntity.getName());
+            noteEntity.setOperationTime(new Date());
+
+            operationNoteService.save(noteEntity);
             result.successResponse(Const.SUCCESS, organizationEntity, "删除机构成功");
         } catch (Exception e) {
             logger.warn("删除机构异常", e);
@@ -134,7 +161,7 @@ public class OrganizationController {
      */
     //@PutMapping("/update")
     @PostMapping("/update")
-    public RestApiResponse<OrganizationEntity> update(@RequestBody OrganizationEntity organizationEntity) {
+    public RestApiResponse<OrganizationEntity> update(@RequestBody OrganizationEntity organizationEntity, @RequestParam int userId) {
         RestApiResponse<OrganizationEntity> result = new RestApiResponse<OrganizationEntity>();
         try {
             OrganizationEntity organization = organizationService.findOne(organizationEntity.getId());
@@ -160,6 +187,17 @@ public class OrganizationController {
                 }
             }*/
             OrganizationEntity entity = organizationService.update(organizationEntity);
+
+            //保存当前用户的操作记录
+            UserEntity userEntity = userService.findById(userId);
+
+            OperationNoteEntity noteEntity = new OperationNoteEntity();
+            noteEntity.setUserName(userEntity.getUsername());
+            noteEntity.setOperationLog(userEntity.getUsername()+"修改智库机构:" + entity.getName());
+            noteEntity.setOperationTime(new Date());
+
+            operationNoteService.save(noteEntity);
+
             result.successResponse(Const.SUCCESS, entity, "修改机构成功");
         } catch (Exception e) {
             logger.warn("修改机构异常", e);

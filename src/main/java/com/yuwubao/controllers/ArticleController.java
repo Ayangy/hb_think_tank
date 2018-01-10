@@ -1,11 +1,7 @@
 package com.yuwubao.controllers;
 
-import com.yuwubao.entities.ArticleEntity;
-import com.yuwubao.entities.ArticleSortEntity;
-import com.yuwubao.entities.OrganizationEntity;
-import com.yuwubao.services.ArticleService;
-import com.yuwubao.services.ArticleSortService;
-import com.yuwubao.services.OrganizationService;
+import com.yuwubao.entities.*;
+import com.yuwubao.services.*;
 import com.yuwubao.services.impl.ArticleSearchService;
 import com.yuwubao.util.Const;
 import com.yuwubao.util.RestApiResponse;
@@ -49,6 +45,12 @@ public class ArticleController {
     @Autowired
     private FileUploadController fileUploadController;
 
+    @Autowired
+    private OperationNoteService operationNoteService;
+
+    @Autowired
+    private UserService userService;
+
     /**
      * 查询文章
      * @param index  第几页
@@ -91,7 +93,7 @@ public class ArticleController {
      * 新增文章
      */
     @PostMapping("/add")
-    public RestApiResponse<ArticleEntity> add(@RequestBody ArticleEntity articleEntity) {
+    public RestApiResponse<ArticleEntity> add(@RequestBody ArticleEntity articleEntity, @RequestParam int userId) {
         RestApiResponse<ArticleEntity> result = new RestApiResponse<ArticleEntity>();
         try {
             OrganizationEntity organizationEntity = organizationService.findOne(articleEntity.getOrganizationId());
@@ -104,7 +106,7 @@ public class ArticleController {
                 result.failedApiResponse(Const.FAILED, "文章类型不存在，请重新指定");
                 return result;
             }
-            articleEntity.setAddTime(new Date());
+            //articleEntity.setAddTime(new Date());
             ArticleEntity article = articleService.add(articleEntity);
             if (article == null) {
                 result.failedApiResponse(Const.FAILED, "添加失败");
@@ -113,6 +115,17 @@ public class ArticleController {
             if (articleEntity.getShield() == 0) {
                 articleSearchService.createDoc(article);
             }
+
+            //保存当前用户的操作记录
+            UserEntity userEntity = userService.findById(userId);
+
+            OperationNoteEntity noteEntity = new OperationNoteEntity();
+            noteEntity.setUserName(userEntity.getUsername());
+            noteEntity.setOperationLog(userEntity.getUsername()+"添加了文章:" + article.getTitle());
+            noteEntity.setOperationTime(new Date());
+
+            operationNoteService.save(noteEntity);
+
             result.successResponse(Const.SUCCESS, article, "添加成功");
         } catch (Exception e) {
             logger.warn("新增文章异常", e);
@@ -128,7 +141,7 @@ public class ArticleController {
      */
     //@DeleteMapping("/delete")
     @PostMapping("/delete")
-    public RestApiResponse<ArticleEntity> delete(@RequestParam int id) {
+    public RestApiResponse<ArticleEntity> delete(@RequestParam int id, @RequestParam int userId) {
         RestApiResponse<ArticleEntity> result = new RestApiResponse<ArticleEntity>();
         try {
             ArticleEntity articleEntity = articleService.delete(id);
@@ -140,6 +153,17 @@ public class ArticleController {
             if (StringUtils.isNotBlank(articleEntity.getImgUrl())) {
                 fileUploadController.deleteFile(articleEntity.getImgUrl());
             }
+
+            //保存当前用户的操作记录
+            UserEntity userEntity = userService.findById(userId);
+
+            OperationNoteEntity noteEntity = new OperationNoteEntity();
+            noteEntity.setUserName(userEntity.getUsername());
+            noteEntity.setOperationLog(userEntity.getUsername()+"删除了文章:" + articleEntity.getTitle());
+            noteEntity.setOperationTime(new Date());
+
+            operationNoteService.save(noteEntity);
+
             result.successResponse(Const.SUCCESS, articleEntity, "删除成功");
         } catch (Exception e) {
             logger.warn("删除文章异常", e);
@@ -153,7 +177,7 @@ public class ArticleController {
      */
     //@PutMapping("/update")
     @PostMapping("/update")
-    public RestApiResponse<ArticleEntity> update(@RequestBody ArticleEntity articleEntity) {
+    public RestApiResponse<ArticleEntity> update(@RequestBody ArticleEntity articleEntity, @RequestParam int userId) {
         RestApiResponse<ArticleEntity> result = new RestApiResponse<ArticleEntity>();
         try {
             ArticleEntity oldEntity = articleService.findById(articleEntity.getId());
@@ -184,6 +208,16 @@ public class ArticleController {
             } else {
                 articleSearchService.delete(String.valueOf(article.getId()));
             }
+
+            //保存当前用户的操作记录
+            UserEntity userEntity = userService.findById(userId);
+
+            OperationNoteEntity noteEntity = new OperationNoteEntity();
+            noteEntity.setUserName(userEntity.getUsername());
+            noteEntity.setOperationLog(userEntity.getUsername()+"修改了文章:" + articleEntity.getTitle());
+            noteEntity.setOperationTime(new Date());
+
+            operationNoteService.save(noteEntity);
             result.successResponse(Const.SUCCESS, article, "修改成功");
         } catch (Exception e) {
             logger.warn("修改文章异常", e);

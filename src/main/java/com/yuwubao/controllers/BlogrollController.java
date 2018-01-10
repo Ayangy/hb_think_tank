@@ -1,7 +1,11 @@
 package com.yuwubao.controllers;
 
 import com.yuwubao.entities.BlogrollEntity;
+import com.yuwubao.entities.OperationNoteEntity;
+import com.yuwubao.entities.UserEntity;
 import com.yuwubao.services.BlogrollService;
+import com.yuwubao.services.OperationNoteService;
+import com.yuwubao.services.UserService;
 import com.yuwubao.util.Const;
 import com.yuwubao.util.RestApiResponse;
 import org.apache.commons.lang3.StringUtils;
@@ -14,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,6 +35,12 @@ public class BlogrollController {
 
     @Autowired
     private BlogrollService blogrollService;
+
+    @Autowired
+    private OperationNoteService operationNoteService;
+
+    @Autowired
+    private UserService userService;
 
     /**
      * 查询合作单位
@@ -64,7 +75,7 @@ public class BlogrollController {
      * 新增合作单位
      */
     @PostMapping("/add")
-    public RestApiResponse<BlogrollEntity> add(@RequestBody BlogrollEntity blogrollEntity) {
+    public RestApiResponse<BlogrollEntity> add(@RequestBody BlogrollEntity blogrollEntity, @RequestParam int userId) {
         RestApiResponse<BlogrollEntity> result = new RestApiResponse<BlogrollEntity>();
         try {
             if (blogrollEntity.getName() == null) {
@@ -77,6 +88,17 @@ public class BlogrollController {
                 return result;
             }
             BlogrollEntity blogroll = blogrollService.add(blogrollEntity);
+
+            //保存当前用户的操作记录
+            UserEntity userEntity = userService.findById(userId);
+
+            OperationNoteEntity noteEntity = new OperationNoteEntity();
+            noteEntity.setUserName(userEntity.getUsername());
+            noteEntity.setOperationLog(userEntity.getUsername()+"添加合作单位:" + blogroll.getName());
+            noteEntity.setOperationTime(new Date());
+
+            operationNoteService.save(noteEntity);
+
             result.successResponse(Const.SUCCESS, blogroll, "添加成功");
         } catch (Exception e) {
             logger.warn("合作单位新增异常", e);
@@ -92,7 +114,7 @@ public class BlogrollController {
      */
     //@DeleteMapping("/delete")
     @PostMapping("/delete")
-    public RestApiResponse<BlogrollEntity> delete(@RequestParam int id) {
+    public RestApiResponse<BlogrollEntity> delete(@RequestParam int id, @RequestParam int userId) {
         RestApiResponse<BlogrollEntity> result = new RestApiResponse<BlogrollEntity>();
         try {
             BlogrollEntity blogrollEntity = blogrollService.delete(id);
@@ -100,6 +122,17 @@ public class BlogrollController {
                 result.failedApiResponse(Const.FAILED, "删除失败,合作单位不存在");
                 return result;
             }
+
+            //保存当前用户的操作记录
+            UserEntity userEntity = userService.findById(userId);
+
+            OperationNoteEntity noteEntity = new OperationNoteEntity();
+            noteEntity.setUserName(userEntity.getUsername());
+            noteEntity.setOperationLog(userEntity.getUsername()+"删除合作单位:" + blogrollEntity.getName());
+            noteEntity.setOperationTime(new Date());
+
+            operationNoteService.save(noteEntity);
+
             result.successResponse(Const.SUCCESS, blogrollEntity, "删除成功");
         } catch (Exception e) {
             logger.warn("删除合作单位异常", e);
@@ -113,7 +146,7 @@ public class BlogrollController {
      */
     @PostMapping("/update")
    // @PutMapping("/update")
-    public RestApiResponse<BlogrollEntity> update(@RequestBody BlogrollEntity blogrollEntity) {
+    public RestApiResponse<BlogrollEntity> update(@RequestBody BlogrollEntity blogrollEntity, @RequestParam int userId) {
         RestApiResponse<BlogrollEntity> result = new RestApiResponse<BlogrollEntity>();
         try {
             if (!StringUtils.isNotBlank(blogrollEntity.getName())) {
@@ -137,6 +170,17 @@ public class BlogrollController {
                 result.failedApiResponse(Const.FAILED, "修改失败");
                 return result;
             }
+
+            //保存当前用户的操作记录
+            UserEntity userEntity = userService.findById(userId);
+
+            OperationNoteEntity noteEntity = new OperationNoteEntity();
+            noteEntity.setUserName(userEntity.getUsername());
+            noteEntity.setOperationLog(userEntity.getUsername()+"修改合作单位:" + entity.getName());
+            noteEntity.setOperationTime(new Date());
+
+            operationNoteService.save(noteEntity);
+
             result.successResponse(Const.SUCCESS, entity, "修改成功");
         } catch (Exception e) {
             logger.warn("修改合作单位异常", e);

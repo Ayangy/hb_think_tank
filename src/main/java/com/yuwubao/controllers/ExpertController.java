@@ -1,9 +1,13 @@
 package com.yuwubao.controllers;
 
 import com.yuwubao.entities.ExpertEntity;
+import com.yuwubao.entities.OperationNoteEntity;
 import com.yuwubao.entities.OrganizationEntity;
+import com.yuwubao.entities.UserEntity;
 import com.yuwubao.services.ExpertService;
+import com.yuwubao.services.OperationNoteService;
 import com.yuwubao.services.OrganizationService;
+import com.yuwubao.services.UserService;
 import com.yuwubao.util.Const;
 import com.yuwubao.util.RestApiResponse;
 import org.apache.commons.lang3.StringUtils;
@@ -15,6 +19,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +42,12 @@ public class ExpertController {
 
     @Autowired
     private FileUploadController fileUploadController;
+
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private OperationNoteService operationNoteService;
 
     /**
      * 查询专家列表
@@ -70,7 +81,7 @@ public class ExpertController {
      * 新增专家
      */
     @PostMapping("/add")
-    public RestApiResponse<ExpertEntity> add(@RequestBody ExpertEntity expertEntity) {
+    public RestApiResponse<ExpertEntity> add(@RequestBody ExpertEntity expertEntity, @RequestParam int userId) {
         RestApiResponse<ExpertEntity> result = new RestApiResponse<ExpertEntity>();
         try {
             OrganizationEntity organizationEntity = organizationService.findOne(expertEntity.getOrganizationId());
@@ -84,6 +95,17 @@ public class ExpertController {
                 result.failedApiResponse(Const.FAILED, "添加失败");
                 return result;
             }
+
+            //保存当前用户的操作记录
+            UserEntity userEntity = userService.findById(userId);
+
+            OperationNoteEntity noteEntity = new OperationNoteEntity();
+            noteEntity.setUserName(userEntity.getUsername());
+            noteEntity.setOperationLog(userEntity.getUsername()+"新增专家:" + expert.getName());
+            noteEntity.setOperationTime(new Date());
+
+            operationNoteService.save(noteEntity);
+
             result.successResponse(Const.SUCCESS, expert, "添加成功");
         } catch (Exception e) {
             logger.warn("新增专家异常:", e);
@@ -99,7 +121,7 @@ public class ExpertController {
      */
     //@DeleteMapping("/delete")
     @PostMapping("/delete")
-    public RestApiResponse<ExpertEntity> delete(@RequestParam(required = true) int id) {
+    public RestApiResponse<ExpertEntity> delete(@RequestParam(required = true) int id, @RequestParam int userId) {
         RestApiResponse<ExpertEntity> result = new RestApiResponse<ExpertEntity>();
         try {
             ExpertEntity expertEntity = expertService.delete(id);
@@ -110,6 +132,17 @@ public class ExpertController {
             if (StringUtils.isNotBlank(expertEntity.getImg())) {
                 fileUploadController.deleteFile(expertEntity.getImg());
             }
+
+            //保存当前用户的操作记录
+            UserEntity userEntity = userService.findById(userId);
+
+            OperationNoteEntity noteEntity = new OperationNoteEntity();
+            noteEntity.setUserName(userEntity.getUsername());
+            noteEntity.setOperationLog(userEntity.getUsername()+"删除专家:" + expertEntity.getName());
+            noteEntity.setOperationTime(new Date());
+
+            operationNoteService.save(noteEntity);
+
             result.successResponse(Const.SUCCESS, expertEntity, "删除成功");
             fileUploadController.deleteFile(expertEntity.getImg());
         } catch (Exception e) {
@@ -124,7 +157,7 @@ public class ExpertController {
      */
     //@PutMapping("/update")
     @PostMapping("/update")
-    public RestApiResponse<ExpertEntity> update(@RequestBody ExpertEntity expertEntity) {
+    public RestApiResponse<ExpertEntity> update(@RequestBody ExpertEntity expertEntity, @RequestParam int userId) {
         RestApiResponse<ExpertEntity> result = new RestApiResponse<ExpertEntity>();
         try {
             OrganizationEntity organizationEntity = organizationService.findOne(expertEntity.getOrganizationId());
@@ -146,6 +179,17 @@ public class ExpertController {
                 }
             }
             ExpertEntity expert = expertService.update(expertEntity);
+
+            //保存当前用户的操作记录
+            UserEntity userEntity = userService.findById(userId);
+
+            OperationNoteEntity noteEntity = new OperationNoteEntity();
+            noteEntity.setUserName(userEntity.getUsername());
+            noteEntity.setOperationLog(userEntity.getUsername()+"修改专家:" + expert.getName());
+            noteEntity.setOperationTime(new Date());
+
+            operationNoteService.save(noteEntity);
+
             result.successResponse(Const.SUCCESS, expert, "修改成功");
         } catch (Exception e) {
             logger.warn("修改专家异常", e);
