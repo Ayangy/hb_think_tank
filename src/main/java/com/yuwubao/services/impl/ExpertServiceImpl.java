@@ -100,7 +100,9 @@ public class ExpertServiceImpl implements ExpertService {
 
     @Override
     public List<ExpertEntity> findByShield(int shield) {
-        List<ExpertEntity> list = expertRepository.findByShield(shield);
+        String sql = "select * from zk_expert where shield=? ORDER BY sortIndex";
+        RowMapper<ExpertEntity> rowMapper = new BeanPropertyRowMapper<>(ExpertEntity.class);
+        List<ExpertEntity> list = jdbcTemplate.query(sql, rowMapper, shield);
         return list;
     }
 

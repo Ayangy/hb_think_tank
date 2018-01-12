@@ -95,4 +95,10 @@ public class TitleImgServiceImpl implements TitleImgService {
         List<TitleImgEntity> list = titleImgRepository.findByState(state);
         return list;
     }
+
+    @Override
+    public List<TitleImgEntity> findByStateAndAdvertisingPlace(int i, int advertisingPlace) {
+        List<TitleImgEntity> list = titleImgRepository.findByStateAndAdvertisingPlace(i, advertisingPlace);
+        return list;
+    }
 }

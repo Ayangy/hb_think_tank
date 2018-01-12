@@ -133,15 +133,17 @@ public class TitleImgController {
     }
 
     /**
-     * 获取展示图片
+     * 获取广告位图片
+     * @param advertisingPlace  广告位置0(头部),1(中上),2(中部), 3(中下)
+     * @return
      */
     @GetMapping("/findByState")
-    public RestApiResponse<List<TitleImgEntity>> findByState() {
+    public RestApiResponse<List<TitleImgEntity>> findByState(@RequestParam int advertisingPlace) {
         RestApiResponse<List<TitleImgEntity>> result = new RestApiResponse<List<TitleImgEntity>>();
         try {
-            List<TitleImgEntity> list = titleImgService.findByState(1);
+            List<TitleImgEntity> list = titleImgService.findByStateAndAdvertisingPlace(1, advertisingPlace);
             if (list.size() == 0) {
-                result.failedApiResponse(Const.FAILED, "无展示图片");
+                result.failedApiResponse(Const.FAILED, "暂无数据");
                 return result;
             }
             result.successResponse(Const.SUCCESS, list);

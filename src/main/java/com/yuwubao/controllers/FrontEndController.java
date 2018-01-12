@@ -203,8 +203,9 @@ public class FrontEndController {
 
     /**
      * 通过首字母查询未屏蔽机构
-     * @param type  机构类型
+     * @param type  机构类型 0(智库机构)，1(智库联盟)
      * @param letter  查询字母
+     * @param organizationType  机构类型1(党政智库),2(社科院智库),3(党校（行政学院）智库),4(省级专门智库),5(省级改革智库),6(高校智库),7(社会智库)
      * @return
      */
     @GetMapping("/findOrganizationByLetter")
@@ -422,7 +423,8 @@ public class FrontEndController {
      * @param index  第几页
      * @param size  每页几条
      * @param keyword  查询值
-     * @param parentId  文章类型
+     * @param parentId  文章父级类型
+     * @param textTypeId  文章子类型
      * @param sort  排序 0(降序),1(升序)
      * @return
      */
@@ -430,13 +432,14 @@ public class FrontEndController {
     public RestApiResponse<List<ArticleEntity>> findResultByCriteria(@RequestParam(defaultValue = "0", required = false)int index,
                                                           @RequestParam(defaultValue = "10", required = false)int size,
                                                           @RequestParam(required = false, defaultValue = "")String keyword,
-                                                          @RequestParam(required = false, defaultValue = "28")int parentId,
+                                                          @RequestParam(required = false, defaultValue = "0")int textTypeId,
+                                                          @RequestParam(required = false, defaultValue = "0")int parentId,
                                                           @RequestParam(required = false, defaultValue = "0")int sort) {
         RestApiResponse<List<ArticleEntity>> result = new RestApiResponse<List<ArticleEntity>>();
         try {
             Map<String, String> map = new HashMap<String, String>();
             map.put("keyword", keyword);
-            List<ArticleEntity> list = articleService.findByCriteria(map, parentId, sort, index, size);
+            List<ArticleEntity> list = articleService.findByCriteria(map,parentId, textTypeId, sort, index, size);
             result.successResponse(Const.SUCCESS, list);
         } catch (Exception e) {
             logger.warn("查询失败", e);
@@ -580,7 +583,7 @@ public class FrontEndController {
     }
 
     /**
-     * 数据库查询
+     * 专题库查询
      * @param index  第几页
      * @param size  每页几条
      * @param keyword  查询值
@@ -599,8 +602,8 @@ public class FrontEndController {
             List<ArticleEntity> list = articleService.getDatabase(index,size, keyword, beginTime, endTime);
             result.successResponse(Const.SUCCESS, list);
         } catch (Exception e) {
-            logger.warn("获取数据库列表异常", e);
-            result.failedApiResponse(Const.FAILED, "获取数据库列表异常");
+            logger.warn("获取专题库列表异常", e);
+            result.failedApiResponse(Const.FAILED, "获取专题库列表异常");
         }
         return result;
     }
@@ -626,9 +629,9 @@ public class FrontEndController {
 
     /**
      * 条件查询音视频
-     * @param index
-     * @param size
-     * @param query
+     * @param index 第几页
+     * @param size  每页几条
+     * @param query  查询字符串
      * @return
      */
     @GetMapping("/findByString")

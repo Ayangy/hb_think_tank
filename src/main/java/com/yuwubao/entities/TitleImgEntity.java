@@ -33,6 +33,11 @@ public class TitleImgEntity {
      */
     private int state;
 
+    /**
+     * 广告位置0(头部),1(中上),2(中部), 3(中下)
+     */
+    private int advertisingPlace;
+
     public int getId() {
         return id;
     }

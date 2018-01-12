@@ -58,8 +58,8 @@ public class OperationNoteController {
             Page<OperationNoteEntity> list = operationNoteService.findAll(map, pageAble);
             result.successResponse(Const.SUCCESS, list, "获取列表成功");
         } catch (Exception e) {
-            logger.warn("操作记录列表查询异常", e);
-            result.failedApiResponse(Const.FAILED, "操作记录列表查询异常");
+            logger.warn("获取操作记录异常", e);
+            result.failedApiResponse(Const.FAILED, "获取操作记录异常");
         }
         return result;
     }

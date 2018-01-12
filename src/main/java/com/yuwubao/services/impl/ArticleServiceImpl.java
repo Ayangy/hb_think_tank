@@ -156,7 +156,7 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public List<ArticleEntity> findByCriteria(Map<String, String> map, int parentId, int sort, int index, int size) {
+    public List<ArticleEntity> findByCriteria(Map<String, String> map, int parentId,int textTypeId, int sort, int index, int size) {
         String keyword = map.get("keyword");
         String sql = "SELECT a.id," +
                 "a.title," +
@@ -170,6 +170,9 @@ public class ArticleServiceImpl implements ArticleService {
                 "a.addTime," +
                 "a.shield," +
                 "a.recommend from article a, article_sort s WHERE a.textTypeId = s.id AND a.shield = 0";
+        if (textTypeId != 0) {
+            sql += " AND a.textTypeId = " + textTypeId;
+        }
         if (parentId != 0) {
             sql += " AND s.parentId = " + parentId;
         }
@@ -304,7 +307,7 @@ public class ArticleServiceImpl implements ArticleService {
                     "OR content LIKE '%" + keyword + "%'" +
                     ")";
         }
-        sql += " limit ?, ?";
+        sql += "ORDER BY a.addTime DESC limit ?, ?";
         RowMapper<ArticleEntity> rowMapper = new BeanPropertyRowMapper<>(ArticleEntity.class);
         List<ArticleEntity> list = jdbcTemplate.query(sql, rowMapper, index, size);
         return list;

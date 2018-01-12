@@ -11,4 +11,6 @@ import java.util.List;
  */
 public interface TitleImgRepository extends JpaRepository<TitleImgEntity, Integer>, JpaSpecificationExecutor<TitleImgEntity> {
     List<TitleImgEntity> findByState(int state);
+
+    List<TitleImgEntity> findByStateAndAdvertisingPlace(int i, int advertisingPlace);
 }
