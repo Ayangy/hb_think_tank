@@ -1,7 +1,6 @@
 package com.yuwubao.entities;
 
 import javax.persistence.*;
-import java.util.Date;
 
 /**
  * Created by yangyu on 2017/11/3.
@@ -10,73 +9,107 @@ import java.util.Date;
 @Entity
 @Table( name = "zk_expert")
 public class ExpertEntity {
-
     /**
      * 主键、自增长
      */
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
+
     /**
-     *  头像
+     * 专家照片
      */
     private String img;
+
     /**
-     *  姓名
+     * 专家姓名
      */
     private String name;
+
     /**
-     *  性别
+     * 性别
      */
     private String sex;
+
     /**
-     *  籍贯
+     * 籍贯
      */
     private String nativePlace;
+
     /**
-     *  出生日期
+     * 出生日期
      */
-    private Date dateOfBirth;
+    private String dateOfBirth;
+
     /**
-     *  职称
+     * 职称
      */
-    private String jobTitle;
+    private String position;
+
     /**
-     *  职务
+     * 职务
      */
     private String duty;
+
     /**
-     *  专家称号
+     * 专家称号
      */
     private String expertsTitles;
+
     /**
-     *  所在单位
+     * 所属机构id
      */
-    private String company;
+    private int organizationId;
+
     /**
-     *  学历
+     * 所属机构名
      */
-    private String education;
+    private String organizationName;
+
     /**
-     *  学位
+     * 学历
+     */
+    private String educational;
+
+    /**
+     * 学位
      */
     private String degree;
+
     /**
-     *  简历
+     * 简历
      */
     private String resume;
+
     /**
-     *  研究领域
+     * 研究领域
      */
-    private String researchField;
+    private String research;
+
     /**
-     *  决策咨询成果
+     * 研究领域类型
+     */
+    private int fieldType;
+
+    /**
+     * 决策咨询成果
      */
     private String decisionConsultingResult;
+
     /**
-     *  学术成果
+     * 学术成果
      */
     private String academicWorks;
+
+    /**
+     * 0(不屏蔽), 1(屏蔽)
+     */
+    private int shield;
+
+    /**
+     * 排序索引
+     */
+    private int sortIndex;
 
     public int getId() {
         return id;
@@ -118,20 +151,20 @@ public class ExpertEntity {
         this.nativePlace = nativePlace;
     }
 
-    public Date getDateOfBirth() {
+    public String getDateOfBirth() {
         return dateOfBirth;
     }
 
-    public void setDateOfBirth(Date dateOfBirth) {
+    public void setDateOfBirth(String dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
     }
 
-    public String getJobTitle() {
-        return jobTitle;
+    public String getPosition() {
+        return position;
     }
 
-    public void setJobTitle(String jobTitle) {
-        this.jobTitle = jobTitle;
+    public void setPosition(String position) {
+        this.position = position;
     }
 
     public String getDuty() {
@@ -150,20 +183,28 @@ public class ExpertEntity {
         this.expertsTitles = expertsTitles;
     }
 
-    public String getCompany() {
-        return company;
+    public int getOrganizationId() {
+        return organizationId;
     }
 
-    public void setCompany(String company) {
-        this.company = company;
+    public void setOrganizationId(int organizationId) {
+        this.organizationId = organizationId;
     }
 
-    public String getEducation() {
-        return education;
+    public String getOrganizationName() {
+        return organizationName;
     }
 
-    public void setEducation(String education) {
-        this.education = education;
+    public void setOrganizationName(String organizationName) {
+        this.organizationName = organizationName;
+    }
+
+    public String getEducational() {
+        return educational;
+    }
+
+    public void setEducational(String educational) {
+        this.educational = educational;
     }
 
     public String getDegree() {
@@ -182,12 +223,20 @@ public class ExpertEntity {
         this.resume = resume;
     }
 
-    public String getResearchField() {
-        return researchField;
+    public String getResearch() {
+        return research;
     }
 
-    public void setResearchField(String researchField) {
-        this.researchField = researchField;
+    public void setResearch(String research) {
+        this.research = research;
+    }
+
+    public int getFieldType() {
+        return fieldType;
+    }
+
+    public void setFieldType(int fieldType) {
+        this.fieldType = fieldType;
     }
 
     public String getDecisionConsultingResult() {
@@ -204,5 +253,21 @@ public class ExpertEntity {
 
     public void setAcademicWorks(String academicWorks) {
         this.academicWorks = academicWorks;
+    }
+
+    public int getShield() {
+        return shield;
+    }
+
+    public void setShield(int shield) {
+        this.shield = shield;
+    }
+
+    public int getSortIndex() {
+        return sortIndex;
+    }
+
+    public void setSortIndex(int sortIndex) {
+        this.sortIndex = sortIndex;
     }
 }

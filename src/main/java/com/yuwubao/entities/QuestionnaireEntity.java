@@ -5,6 +5,7 @@ import java.util.Date;
 
 /**
  * Created by yangyu on 2017/12/26.
+ * 调查问卷实体
  */
 @Entity
 @Table(name = "questionnaire")

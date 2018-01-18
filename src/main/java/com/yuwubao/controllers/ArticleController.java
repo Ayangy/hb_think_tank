@@ -96,17 +96,19 @@ public class ArticleController {
     public RestApiResponse<ArticleEntity> add(@RequestBody ArticleEntity articleEntity, @RequestParam int userId) {
         RestApiResponse<ArticleEntity> result = new RestApiResponse<ArticleEntity>();
         try {
-            OrganizationEntity organizationEntity = organizationService.findOne(articleEntity.getOrganizationId());
-            if (organizationEntity == null) {
-                result.failedApiResponse(Const.FAILED, "指定的机构不存在");
-                return result;
+            if (articleEntity.getId() == 0) {
+                ArticleSortEntity articleSortEntity = articleSortService.findById(articleEntity.getTextTypeId());
+                if (articleSortEntity == null) {
+                    result.failedApiResponse(Const.FAILED, "文章类型不存在，请重新指定");
+                    return result;
+                }
+            } else {
+                if (articleEntity.getTextTypeId() == 0) {
+                    ArticleEntity oldArticle = articleService.findById(articleEntity.getId());
+                    articleEntity.setTextTypeId(oldArticle.getTextTypeId());
+                }
             }
-            ArticleSortEntity articleSortEntity = articleSortService.findById(articleEntity.getTextTypeId());
-            if (articleSortEntity == null) {
-                result.failedApiResponse(Const.FAILED, "文章类型不存在，请重新指定");
-                return result;
-            }
-            //articleEntity.setAddTime(new Date());
+            articleEntity.setAddTime(new Date());
             ArticleEntity article = articleService.add(articleEntity);
             if (article == null) {
                 result.failedApiResponse(Const.FAILED, "添加失败");
@@ -189,14 +191,19 @@ public class ArticleController {
                     return result;
                 }
             }
-
-            if (oldEntity.getTextTypeId() != articleEntity.getTextTypeId()) {
-                ArticleSortEntity articleSortEntity = articleSortService.findById(articleEntity.getTextTypeId());
-                if (articleSortEntity == null) {
-                    result.failedApiResponse(Const.FAILED, "文章类型不存在，请重新指定");
-                    return result;
+            int textTypeId = articleEntity.getTextTypeId();
+            if (textTypeId == 0) {
+                articleEntity.setTextTypeId(oldEntity.getTextTypeId());
+            } else {
+                if (oldEntity.getTextTypeId() != articleEntity.getTextTypeId()) {
+                    ArticleSortEntity articleSortEntity = articleSortService.findById(articleEntity.getTextTypeId());
+                    if (articleSortEntity == null) {
+                        result.failedApiResponse(Const.FAILED, "文章类型不存在，请重新指定");
+                        return result;
+                    }
                 }
             }
+
             ArticleEntity article = articleService.update(articleEntity);
             if (article == null) {
                 result.failedApiResponse(Const.FAILED, "修改失败，文章不存在");

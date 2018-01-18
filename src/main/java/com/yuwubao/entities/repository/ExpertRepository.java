@@ -11,4 +11,6 @@ import java.util.List;
  */
 public interface ExpertRepository extends JpaRepository<ExpertEntity, Integer>, JpaSpecificationExecutor<ExpertEntity> {
     List<ExpertEntity> findByShield(int shield);
+
+    List<ExpertEntity> findByOrganizationId(int id);
 }

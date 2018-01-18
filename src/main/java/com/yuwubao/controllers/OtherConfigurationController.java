@@ -101,7 +101,9 @@ public class OtherConfigurationController {
                 case 4:
                     configurationType = "网站声明";
                     break;
-
+                case 5:
+                    configurationType = "联系我们";
+                    break;
             }
             UserEntity userEntity = userService.findById(userId);
 
@@ -155,7 +157,9 @@ public class OtherConfigurationController {
                 case 4:
                     configurationType = "网站声明";
                     break;
-
+                case 5:
+                    configurationType = "联系我们";
+                    break;
             }
             UserEntity userEntity = userService.findById(userId);
 
@@ -213,7 +217,9 @@ public class OtherConfigurationController {
                 case 4:
                     configurationType = "网站声明";
                     break;
-
+                case 5:
+                    configurationType = "联系我们";
+                    break;
             }
             UserEntity userEntity = userService.findById(userId);
 

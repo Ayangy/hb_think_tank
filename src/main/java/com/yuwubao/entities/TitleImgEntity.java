@@ -4,7 +4,7 @@ import javax.persistence.*;
 import java.util.Date;
 
 /**
- * 首页头部图片实体
+ * 专题位图片实体
  * Created by yangyu on 2017/11/8.
  */
 @Entity

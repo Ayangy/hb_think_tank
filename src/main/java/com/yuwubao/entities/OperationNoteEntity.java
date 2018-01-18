@@ -5,6 +5,7 @@ import java.util.Date;
 
 /**
  * Created by yangyu on 2018/1/9.
+ * 操作记录实体
  */
 @Entity
 @Table(name = "operation_note")

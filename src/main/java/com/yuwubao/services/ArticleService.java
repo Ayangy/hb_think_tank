@@ -43,7 +43,7 @@ public interface ArticleService {
 
     List<ArticleEntity> findByTextTypeId(int id);
 
-    List<ArticleEntity> findByTextTypeIdAndShield(int textTypeId, int shield);
+    List<ArticleEntity> findByParentIdAndShield(int parentId, int shield);
 
     List<ArticleEntity> findOrganizationArticle(int textTypeId, int organizationId, int index, int size, int i);
 
@@ -52,4 +52,6 @@ public interface ArticleService {
     List<ArticleEntity> findByString(String query, int textTypeId, int index, int size);
 
     List<ArticleEntity> findLiteratureList(int index, int size, int literatureType);
+
+    List<ArticleEntity> findByArticleSortAndShieldPage(int textTypeId, int parentId, int shield, int index, int size);
 }

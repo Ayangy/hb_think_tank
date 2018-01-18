@@ -26,8 +26,8 @@ public class QuestionnaireServiceImpl implements QuestionnaireService{
     private QuestionnaireRepository questionnaireRepository;
 
     @Override
-    public QuestionnaireEntity findByClientUserId(int clientUserId) {
-        QuestionnaireEntity entity = questionnaireRepository.findByClientUserId(clientUserId);
+    public QuestionnaireEntity findByClientUserIdAndArticleId(int clientUserId, int articleId) {
+        QuestionnaireEntity entity = questionnaireRepository.findByClientUserIdAndArticleId(clientUserId, articleId);
         return entity;
     }
 

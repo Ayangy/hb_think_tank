@@ -139,4 +139,10 @@ public class ExpertServiceImpl implements ExpertService {
         };
         return expertRepository.findAll(spec);
     }
+
+    @Override
+    public List<ExpertEntity> findByOrganizationId(int id) {
+        List<ExpertEntity> list = expertRepository.findByOrganizationId(id);
+        return list;
+    }
 }

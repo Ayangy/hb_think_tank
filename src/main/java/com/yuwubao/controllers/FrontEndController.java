@@ -83,6 +83,9 @@ public class FrontEndController {
     @Autowired
     private QuestionnaireService questionnaireService;
 
+    @Autowired
+    private OtherConfigurationService otherConfigurationService;
+
     /**
      * 获取未屏蔽的最新文章
      * @param textTypeId  文章类型
@@ -165,7 +168,7 @@ public class FrontEndController {
      * @return
      */
     @GetMapping("/findExpertByCondition")
-    public RestApiResponse<Map<String, List<ExpertEntity>>> findExpertByCondition(@RequestParam(required = false, defaultValue = "")String field,
+    public RestApiResponse<Map<String, List<ExpertEntity>>> findExpertByCondition(@RequestParam(required = false, defaultValue = "name")String field,
                                                                                   @RequestParam(required = false, defaultValue = "")String keyword,
                                                                                   @RequestParam(required = false, defaultValue = "-1")int fieldType){
         RestApiResponse<Map<String, List<ExpertEntity>>> result = new RestApiResponse<Map<String, List<ExpertEntity>>>();
@@ -192,6 +195,10 @@ public class FrontEndController {
                     }
                 }
                 endResult.put(s, entities);
+            }
+            if (endResult.size() == 0) {
+                result.successResponse(Const.SUCCESS, null);
+                return result;
             }
             result.successResponse(Const.SUCCESS, endResult);
         } catch (Exception e) {
@@ -239,7 +246,7 @@ public class FrontEndController {
      * 条件查询未屏蔽机构名
      * @param field 查询字段
      * @param keyword  查询值
-     * @param organizationType  1(大学),2(党校),3(政研室),4(科研机构)
+     * @param organizationType  机构类型1(党政智库),2(社科院智库),3(党校（行政学院）智库),4(省级专门智库),5(省级改革智库),6(高校智库),7(社会智库)
      * @param type  0(智库机构),1(智库联盟)
      * @return
      */
@@ -406,11 +413,21 @@ public class FrontEndController {
     @GetMapping("/articleSort")
     public RestApiResponse<List<ArticleEntity>> articleSort(@RequestParam int textTypeId, @RequestParam int parentId,
                                                             @RequestParam(defaultValue = "0", required = false) int index,
-                                                            @RequestParam(defaultValue = "10", required = false) int size) {
+                                                            @RequestParam(defaultValue = "0", required = false) int size) {
         RestApiResponse<List<ArticleEntity>> result = new RestApiResponse<List<ArticleEntity>>();
         try {
-            List<ArticleEntity> list = articleService.findByArticleSortAndShield(textTypeId, parentId,shield, index, size);
-            result.successResponse(Const.SUCCESS, list);
+            PageUtil pageUtil = new PageUtil();
+            List<ArticleEntity> list = articleService.findByArticleSortAndShieldPage(textTypeId, parentId,shield, index, size);
+            List<ArticleEntity> TotalElements = articleService.findByArticleSortAndShieldPage(textTypeId, parentId, shield, 0, 0);
+
+            //分页数据
+            if (size != 0) {
+                pageUtil.setTotalElements(TotalElements.size());
+                pageUtil.setIndex(index+1);
+                pageUtil.setSize(size);
+                pageUtil.setTotalPages(size, TotalElements.size());
+            }
+            result.successResponse(Const.SUCCESS, list, pageUtil);
         } catch (Exception e) {
             logger.warn("文章分类查询异常", e);
             result.failedApiResponse(Const.FAILED, "文章分类查询异常");
@@ -532,7 +549,7 @@ public class FrontEndController {
     public RestApiResponse<List<ArticleEntity>> getAchievementList(@RequestParam int parentId) {
         RestApiResponse<List<ArticleEntity>> result = new RestApiResponse<>();
         try {
-            List<ArticleEntity> entityList = articleService.findByTextTypeIdAndShield(parentId, 0);
+            List<ArticleEntity> entityList = articleService.findByParentIdAndShield(parentId, 0);
             result.successResponse(Const.SUCCESS, entityList);
         } catch (Exception e) {
             logger.warn("获取文章列表失败", e);
@@ -593,14 +610,23 @@ public class FrontEndController {
      */
     @GetMapping("/getDatabase")
     public RestApiResponse<List<ArticleEntity>> getDatabase(@RequestParam(defaultValue = "0", required = false)int index,
-                                                      @RequestParam(defaultValue = "10", required = false)int size,
+                                                      @RequestParam(defaultValue = "0", required = false)int size,
                                                       @RequestParam(required = false, defaultValue = "")String keyword,
                                                       @RequestParam(required = false, defaultValue = "")String beginTime,
                                                       @RequestParam(required = false, defaultValue = "")String endTime) {
         RestApiResponse<List<ArticleEntity>> result = new RestApiResponse<List<ArticleEntity>>();
         try {
+            PageUtil pageUtil = new PageUtil();
             List<ArticleEntity> list = articleService.getDatabase(index,size, keyword, beginTime, endTime);
-            result.successResponse(Const.SUCCESS, list);
+            List<ArticleEntity> totalElements = articleService.getDatabase(0,0, keyword, beginTime, endTime);
+            //分页数据
+            if (size != 0) {
+                pageUtil.setTotalElements(totalElements.size());
+                pageUtil.setIndex(index+1);
+                pageUtil.setSize(size);
+                pageUtil.setTotalPages(size, totalElements.size());
+            }
+            result.successResponse(Const.SUCCESS, list, pageUtil);
         } catch (Exception e) {
             logger.warn("获取专题库列表异常", e);
             result.failedApiResponse(Const.FAILED, "获取专题库列表异常");
@@ -636,12 +662,23 @@ public class FrontEndController {
      */
     @GetMapping("/findByString")
     public RestApiResponse<List<VideoEntity>> findByString(@RequestParam(defaultValue = "0", required = false)int index,
-                                                           @RequestParam(defaultValue = "10", required = false)int size,
+                                                           @RequestParam(defaultValue = "0", required = false)int size,
                                                            @RequestParam(defaultValue = "", required = false)String query) {
         RestApiResponse<List<VideoEntity>> result = new RestApiResponse<List<VideoEntity>>();
         try {
+            PageUtil pageUtil = new PageUtil();
             List<VideoEntity> list = videoService.findByString(query, index, size);
-            result.successResponse(Const.SUCCESS, list);
+            List<VideoEntity> TotalElements = videoService.findByString(query, 0, 0);
+
+            //分页数据
+            if (size != 0) {
+                pageUtil.setTotalElements(TotalElements.size());
+                pageUtil.setIndex(index+1);
+                pageUtil.setSize(size);
+                pageUtil.setTotalPages(size, TotalElements.size());
+            }
+
+            result.successResponse(Const.SUCCESS, list, pageUtil);
         } catch (Exception e) {
             logger.warn("条件查询音视频异常", e);
             result.failedApiResponse(Const.FAILED, "条件查询音视频异常");
@@ -800,10 +837,10 @@ public class FrontEndController {
             }
             ClientUserEntity clientUserEntity = clientUserService.findOne(clientUserId);
             if (clientUserEntity == null) {
-                result.failedApiResponse(Const.FAILED, "用户不存在,提交失败");
+                result.failedApiResponse(Const.FAILED, "您未注册,提交失败");
                 return result;
             }
-            QuestionnaireEntity questionnaire = questionnaireService.findByClientUserId(clientUserId);
+            QuestionnaireEntity questionnaire = questionnaireService.findByClientUserIdAndArticleId(clientUserId, articleId);
             if (questionnaire != null) {
                 result.failedApiResponse(Const.FAILED, "您已提交问卷");
                 return result;
@@ -857,8 +894,8 @@ public class FrontEndController {
 
     /**
      * 按类型获取智库机构
-     * @param organizationType 机构分型
-     * @param type  机构类型
+     * @param organizationType 机构类型1(党政智库),2(社科院智库),3(党校（行政学院）智库),4(省级专门智库),5(省级改革智库),6(高校智库),7(社会智库)
+     * @param type  机构类型  0(智库机构)，1(智库联盟)
      * @return
      */
     @GetMapping("/findByOrganizationType")
@@ -877,7 +914,7 @@ public class FrontEndController {
 
     /**
      * 找回密码邮箱验证
-     * @param email
+     * @param email  邮箱地址
      * @return
      */
     @PostMapping("/emailVerify")
@@ -966,6 +1003,78 @@ public class FrontEndController {
         } catch (Exception e) {
             logger.warn("重设密码异常", e);
             result.failedApiResponse(Const.FAILED, "重设密码异常");
+        }
+        return result;
+    }
+
+    /**
+     * 获取省内机构
+     * @param type  0(智库机构)，1(智库联盟)
+     * @param organizationType 机构类型1(党政智库),2(社科院智库),3(党校（行政学院）智库),4(省级专门智库),5(省级改革智库),6(高校智库),7(社会智库)
+     * @return
+     */
+    @GetMapping(value = "/getProvinceOrganization", consumes="application/json;charset=UTF-8")
+    public RestApiResponse<List<OrganizationEntity>> getProvinceOrganization(@RequestParam(required = false,defaultValue = "0") int type,
+                                                                             @RequestParam(required = false,defaultValue = "0") int organizationType) {
+        RestApiResponse<List<OrganizationEntity>> result = new RestApiResponse<List<OrganizationEntity>>();
+        try {
+            List<OrganizationEntity> list = organizationService.findByTerritoryNameNotNull(type, shield, organizationType);
+            result.successResponse(Const.SUCCESS, list);
+        } catch (Exception e) {
+            logger.warn("获取省内机构异常", e);
+            result.failedApiResponse(Const.FAILED, "获取省内机构异常");
+        }
+        return result;
+    }
+
+    /**
+     * 获取其它配置
+     * @param type 配置类型0(关于我们),1(加入联盟),2(法律顾问),3(广告服务),4(网站声明)
+     * @return
+     */
+    @GetMapping("/getOtherConfiguration")
+    public RestApiResponse<OtherConfigurationEntity> getOtherConfiguration(@RequestParam int type) {
+        RestApiResponse<OtherConfigurationEntity> result = new RestApiResponse<OtherConfigurationEntity>();
+        try {
+            OtherConfigurationEntity entity = otherConfigurationService.findByType(type);
+            result.successResponse(Const.SUCCESS, entity);
+        } catch (Exception e) {
+            logger.warn("获取其它配置异常", e);
+            result.failedApiResponse(Const.FAILED, "获取其它配置异常");
+        }
+        return result;
+    }
+
+    /**
+     * 分类查询未屏蔽文章
+     * @param textTypeId  文章类型
+     * @param parentId  父分类
+     * @param index  第几页
+     * @param size  每页几条
+     * @return
+     */
+    @GetMapping("/articleSortPage")
+    public RestApiResponse<List<ArticleEntity>> articleSortPage(@RequestParam int textTypeId, @RequestParam int parentId,
+                                                            @RequestParam(defaultValue = "0", required = false) int index,
+                                                            @RequestParam(defaultValue = "0", required = false) int size) {
+        RestApiResponse<List<ArticleEntity>> result = new RestApiResponse<List<ArticleEntity>>();
+        try {
+            PageUtil pageUtil = new PageUtil();
+            List<ArticleEntity> list = articleService.findByArticleSortAndShieldPage(textTypeId, parentId,shield, index, size);
+            List<ArticleEntity> TotalElements = articleService.findByArticleSortAndShieldPage(textTypeId, parentId, shield, 0, 0);
+
+            //分页数据
+            if (size != 0) {
+                pageUtil.setTotalElements(TotalElements.size());
+                pageUtil.setIndex(index+1);
+                pageUtil.setSize(size);
+                pageUtil.setTotalPages(size, TotalElements.size());
+            }
+
+            result.successResponse(Const.SUCCESS, list, pageUtil);
+        } catch (Exception e) {
+            logger.warn("文章分类查询异常", e);
+            result.failedApiResponse(Const.FAILED, "文章分类查询异常");
         }
         return result;
     }

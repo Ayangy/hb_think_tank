@@ -143,9 +143,16 @@ public class ArticleServiceImpl implements ArticleService {
         if (parentId != 0) {
             sql += " AND s.parentId = " + String.valueOf(parentId);
         }
-        sql += " order by a.addTime desc LIMIT ?, ?";
+        sql += " order by a.addTime desc ";
+        if (size != 0) {
+            if (index == 0) {
+                sql += " LIMIT " + index + "," + size;
+            } else {
+                sql += " LIMIT " + index*size + "," + size;
+            }
+        }
         RowMapper<ArticleEntity> rowMapper = new BeanPropertyRowMapper<>(ArticleEntity.class);
-        List<ArticleEntity> list = jdbcTemplate.query(sql, rowMapper, shield, index, size);
+        List<ArticleEntity> list = jdbcTemplate.query(sql, rowMapper, shield);
         return list;
     }
 
@@ -244,21 +251,12 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public List<ArticleEntity> findByTextTypeIdAndShield(int textTypeId, int shield) {
+    public List<ArticleEntity> findByParentIdAndShield(int parentId, int shield) {
         String sql = "select a.id," +
                 "a.title," +
-                "a.author," +
-                "a.createdDate," +
-                "a.content," +
-                "a.imgUrl," +
-                "a.imgState," +
-                "a.textTypeId," +
-                "a.organizationId," +
-                "a.addTime," +
-                "a.shield," +
-                "a.recommend from article a, article_sort s where a.textTypeId = s.id and s.parentId = ? AND a.shield = ?";
+                "a.imgUrl from article a, article_sort s where a.textTypeId = s.id and s.parentId = ? AND a.shield = ? ORDER BY a.addTime DESC";
         RowMapper<ArticleEntity> rowMapper = new BeanPropertyRowMapper<>(ArticleEntity.class);
-        List<ArticleEntity> list = jdbcTemplate.query(sql, rowMapper, textTypeId, shield);
+        List<ArticleEntity> list = jdbcTemplate.query(sql, rowMapper, parentId, shield);
         return list;
     }
 
@@ -307,9 +305,16 @@ public class ArticleServiceImpl implements ArticleService {
                     "OR content LIKE '%" + keyword + "%'" +
                     ")";
         }
-        sql += "ORDER BY a.addTime DESC limit ?, ?";
+        sql += "ORDER BY a.addTime DESC ";
+        if (size != 0) {
+            if (index == 0) {
+                sql += " limit " + index + ", " + size;
+            } else {
+                sql += " limit " + index*size + ", " + size;
+            }
+        }
         RowMapper<ArticleEntity> rowMapper = new BeanPropertyRowMapper<>(ArticleEntity.class);
-        List<ArticleEntity> list = jdbcTemplate.query(sql, rowMapper, index, size);
+        List<ArticleEntity> list = jdbcTemplate.query(sql, rowMapper);
         return list;
     }
 
@@ -333,6 +338,30 @@ public class ArticleServiceImpl implements ArticleService {
         String sql = "SELECT * FROM article  WHERE  literatureType = ? AND shield = 0 limit ?,?";
         RowMapper<ArticleEntity> rowMapper = new BeanPropertyRowMapper<>(ArticleEntity.class);
         List<ArticleEntity> list = jdbcTemplate.query(sql, rowMapper,literatureType, index, size);
+        return list;
+    }
+
+    @Override
+    public List<ArticleEntity> findByArticleSortAndShieldPage(int textTypeId, int parentId, int shield, int index, int size) {
+        String sql = "SELECT a.id," +
+                "a.title," +
+                " a.addTime, a.imgUrl, a.content, a.imgState, a.textTypeId from article a , article_sort s where a.textTypeId = s.id AND a.shield = ?";
+        if (textTypeId != 0) {
+            sql += " AND a.textTypeId = " + String.valueOf(textTypeId);
+        }
+        if (parentId != 0) {
+            sql += " AND s.parentId = " + String.valueOf(parentId);
+        }
+        sql += " order by a.addTime desc ";
+        if (size != 0) {
+            if (index == 0) {
+                sql += " LIMIT " + index + "," + size;
+            } else {
+                sql += " LIMIT " + index*size + "," + size;
+            }
+        }
+        RowMapper<ArticleEntity> rowMapper = new BeanPropertyRowMapper<>(ArticleEntity.class);
+        List<ArticleEntity> list = jdbcTemplate.query(sql, rowMapper, shield);
         return list;
     }
 
