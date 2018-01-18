@@ -447,7 +447,7 @@ public class FrontEndController {
      */
     @GetMapping("/findResultByCriteria")
     public RestApiResponse<List<ArticleEntity>> findResultByCriteria(@RequestParam(defaultValue = "0", required = false)int index,
-                                                          @RequestParam(defaultValue = "10", required = false)int size,
+                                                          @RequestParam(defaultValue = "0", required = false)int size,
                                                           @RequestParam(required = false, defaultValue = "")String keyword,
                                                           @RequestParam(required = false, defaultValue = "0")int textTypeId,
                                                           @RequestParam(required = false, defaultValue = "0")int parentId,
@@ -457,7 +457,16 @@ public class FrontEndController {
             Map<String, String> map = new HashMap<String, String>();
             map.put("keyword", keyword);
             List<ArticleEntity> list = articleService.findByCriteria(map,parentId, textTypeId, sort, index, size);
-            result.successResponse(Const.SUCCESS, list);
+            List<ArticleEntity> TotalElements = articleService.findByCriteria(map,parentId, textTypeId, sort, 0, 0);
+            PageUtil pageUtil = new PageUtil();
+            //分页数据
+            if (size != 0) {
+                pageUtil.setTotalElements(TotalElements.size());
+                pageUtil.setIndex(index+1);
+                pageUtil.setSize(size);
+                pageUtil.setTotalPages(size, TotalElements.size());
+            }
+            result.successResponse(Const.SUCCESS, list, pageUtil);
         } catch (Exception e) {
             logger.warn("查询失败", e);
             result.failedApiResponse(Const.FAILED, "查询失败");

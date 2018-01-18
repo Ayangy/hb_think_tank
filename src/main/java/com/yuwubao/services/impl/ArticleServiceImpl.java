@@ -195,9 +195,15 @@ public class ArticleServiceImpl implements ArticleService {
         } else {
             sql += " ORDER BY a.addTime";
         }
-        sql += " limit ?, ?";
+        if (size != 0) {
+            if (index == 0) {
+                sql += " limit " + index + ", " + size;
+            } else {
+                sql += " limit " + index*size + ", " + size;
+            }
+        }
         RowMapper<ArticleEntity> rowMapper = new BeanPropertyRowMapper<>(ArticleEntity.class);
-        List<ArticleEntity> list = jdbcTemplate.query(sql, rowMapper, index, size);
+        List<ArticleEntity> list = jdbcTemplate.query(sql, rowMapper);
         return list;
     }
 
@@ -345,7 +351,7 @@ public class ArticleServiceImpl implements ArticleService {
     public List<ArticleEntity> findByArticleSortAndShieldPage(int textTypeId, int parentId, int shield, int index, int size) {
         String sql = "SELECT a.id," +
                 "a.title," +
-                " a.addTime, a.imgUrl, a.content, a.imgState, a.textTypeId from article a , article_sort s where a.textTypeId = s.id AND a.shield = ?";
+                " a.addTime, a.imgUrl, a.content, a.imgState, a.textTypeId, a.author from article a , article_sort s where a.textTypeId = s.id AND a.shield = ?";
         if (textTypeId != 0) {
             sql += " AND a.textTypeId = " + String.valueOf(textTypeId);
         }
