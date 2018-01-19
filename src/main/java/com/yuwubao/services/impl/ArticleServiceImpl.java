@@ -351,7 +351,13 @@ public class ArticleServiceImpl implements ArticleService {
     public List<ArticleEntity> findByArticleSortAndShieldPage(int textTypeId, int parentId, int shield, int index, int size) {
         String sql = "SELECT a.id," +
                 "a.title," +
-                " a.addTime, a.imgUrl, a.content, a.imgState, a.textTypeId, a.author from article a , article_sort s where a.textTypeId = s.id AND a.shield = ?";
+                " a.addTime," +
+                " a.imgUrl," +
+                " a.content," +
+                " a.imgState," +
+                " a.textTypeId," +
+                " a.author," +
+                " a.literatureType, a.source from article a , article_sort s where a.textTypeId = s.id AND a.shield = ?";
         if (textTypeId != 0) {
             sql += " AND a.textTypeId = " + String.valueOf(textTypeId);
         }

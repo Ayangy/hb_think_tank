@@ -50,20 +50,22 @@ public class OrganizationController {
      * @param size  每页几条
      * @param field  查询字段
      * @param keyword  查询值
+     * @param organizationType 机构类型1(党政智库),2(社科院智库),3(党校（行政学院）智库),4(省级专门智库),5(省级改革智库),6(高校智库),7(社会智库)
      * @return
      */
     @GetMapping("/findAll")
     public RestApiResponse<Page<OrganizationEntity>> findAll(@RequestParam(defaultValue = "1", required = false)int index,
-                                @RequestParam(defaultValue = "10", required = false)int size,
-                                @RequestParam(required = false, defaultValue = "")String field,
-                                @RequestParam(required = false, defaultValue = "")String keyword){
+                                                             @RequestParam(defaultValue = "10", required = false)int size,
+                                                             @RequestParam(required = false, defaultValue = "")String field,
+                                                             @RequestParam(required = false, defaultValue = "")String keyword,
+                                                             @RequestParam(defaultValue = "0", required = false)int organizationType){
         RestApiResponse<Page<OrganizationEntity>> result = new RestApiResponse<Page<OrganizationEntity>>();
         try {
             Map<String, String> map = new HashMap();
             map.put("field", field);
             map.put("keyword", keyword);
             Pageable pageAble = new PageRequest(index - 1, size);
-            Page<OrganizationEntity> list = organizationService.findAll(map, pageAble);
+            Page<OrganizationEntity> list = organizationService.findAll(map, pageAble, organizationType);
             result.successResponse(Const.SUCCESS, list, "机构列表查询成功");
         } catch (Exception e) {
             logger.warn("机构列表查询异常", e);

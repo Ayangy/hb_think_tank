@@ -12,7 +12,7 @@ import java.util.Map;
  */
 
 public interface OrganizationService {
-    Page<OrganizationEntity> findAll(Map<String, String> map, Pageable pageAble);
+    Page<OrganizationEntity> findAll(Map<String, String> map, Pageable pageAble, int organizationType);
 
     OrganizationEntity add(OrganizationEntity organizationEntity);
 

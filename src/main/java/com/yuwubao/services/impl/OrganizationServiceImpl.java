@@ -31,7 +31,7 @@ public class OrganizationServiceImpl implements OrganizationService{
     private JdbcTemplate jdbcTemplate;
 
     @Override
-    public Page<OrganizationEntity> findAll(Map<String, String> map, Pageable pageAble) {
+    public Page<OrganizationEntity> findAll(Map<String, String> map, Pageable pageAble, int organizationType) {
         String field = map.get("field");
         String keyword = map.get("keyword");
         Specification<OrganizationEntity> spec = new Specification<OrganizationEntity>() {
@@ -43,6 +43,10 @@ public class OrganizationServiceImpl implements OrganizationService{
                     if (StringUtils.isNotBlank(keyword)) {
                         predict.getExpressions().add(criteriaBuilder.like(exp1, "%" + keyword + "%"));
                     }
+                }
+                if (organizationType != 0) {
+                    Path<Integer> path = root.get("organizationType");
+                    predict.getExpressions().add(criteriaBuilder.equal(path, organizationType));
                 }
                 return predict;
             }
