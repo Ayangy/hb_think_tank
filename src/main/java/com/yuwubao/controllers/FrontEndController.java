@@ -934,7 +934,7 @@ public class FrontEndController {
             String emailType = "湖北智库网重设用户密码";
             String emailContent = "您好：\n" +clientUserEntity.getName() +
                     "，点击或复制到浏览器打开下方链接，重设您的密码"+
-                    "<a href='http://" + serverIp + "/resetpassword.html' _act='check_domail'>http://"+ serverIp +"/resetpassword.html" + "</a>";
+                    "<a href='http://www.hbzhiku.org.cn/resetpassword.html' _act='check_domail'>http://www.hbzhiku.org.cn/resetpassword.html" + "</a>";
             //发送邮件到邮箱
             Sendmail send = new Sendmail(clientUserEntity, myEmailSMTPHost, myEmailAccount, myEmailPwd, emailType, emailContent);
             send.start();

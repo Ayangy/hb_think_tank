@@ -108,7 +108,7 @@ public class ArticleController {
                     articleEntity.setTextTypeId(oldArticle.getTextTypeId());
                 }
             }
-            articleEntity.setAddTime(new Date());
+            //articleEntity.setAddTime(new Date());
             ArticleEntity article = articleService.add(articleEntity);
             if (article == null) {
                 result.failedApiResponse(Const.FAILED, "添加失败");
