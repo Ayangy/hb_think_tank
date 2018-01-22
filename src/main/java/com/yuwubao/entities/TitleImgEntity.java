@@ -4,7 +4,7 @@ import javax.persistence.*;
 import java.util.Date;
 
 /**
- * 首页头部图片实体
+ * 专题位图片实体
  * Created by yangyu on 2017/11/8.
  */
 @Entity
@@ -32,6 +32,11 @@ public class TitleImgEntity {
      * 状态 0(不展示)，1(展示)
      */
     private int state;
+
+    /**
+     * 广告位置0(头部),1(中上),2(中部), 3(中下)
+     */
+    private int advertisingPlace;
 
     public int getId() {
         return id;

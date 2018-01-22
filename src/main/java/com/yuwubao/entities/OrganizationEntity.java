@@ -57,9 +57,14 @@ public class OrganizationEntity {
     private String territoryName;
 
     /**
-     * 机构类型0(大学),1(党校),2(政研室),3(科研机构)
+     * 机构类型1(党政智库),2(社科院智库),3(党校（行政学院）智库),4(省级专门智库),5(省级改革智库),6(高校智库),7(社会智库)
      */
     private int organizationType;
+
+    /**
+     * 排序索引
+     */
+    private int sortIndex;
 
     public int getId() {
         return id;
@@ -139,5 +144,13 @@ public class OrganizationEntity {
 
     public void setContactUs(String contactUs) {
         this.contactUs = contactUs;
+    }
+
+    public int getSortIndex() {
+        return sortIndex;
+    }
+
+    public void setSortIndex(int sortIndex) {
+        this.sortIndex = sortIndex;
     }
 }

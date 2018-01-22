@@ -5,6 +5,7 @@ import java.util.Date;
 
 /**
  * Created by yangyu on 2017/12/26.
+ * 调查问卷实体
  */
 @Entity
 @Table(name = "questionnaire")
@@ -43,7 +44,7 @@ public class QuestionnaireEntity {
     private Date submitTime;
 
     /**
-     * 调查问卷结果Url
+     * 调查问卷Url
      */
     private String QuestionnaireResultUrl;
 

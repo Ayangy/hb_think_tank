@@ -5,6 +5,7 @@ import java.util.Date;
 
 /**
  * Created by yangyu on 2017/12/21.
+ * 评论实体
  */
 @Entity
 @Table(name = "comment")

@@ -1,13 +1,11 @@
 package com.yuwubao.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import javax.persistence.*;
 import java.util.Date;
 
 /**
  * Created by yangyu on 2017/10/16.
- * 用户
+ * 后台用户实体
  */
 @Entity
 @Table(name = "sys_user")

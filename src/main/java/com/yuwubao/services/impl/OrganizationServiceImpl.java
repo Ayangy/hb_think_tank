@@ -31,7 +31,7 @@ public class OrganizationServiceImpl implements OrganizationService{
     private JdbcTemplate jdbcTemplate;
 
     @Override
-    public Page<OrganizationEntity> findAll(Map<String, String> map, Pageable pageAble) {
+    public Page<OrganizationEntity> findAll(Map<String, String> map, Pageable pageAble, int organizationType) {
         String field = map.get("field");
         String keyword = map.get("keyword");
         Specification<OrganizationEntity> spec = new Specification<OrganizationEntity>() {
@@ -43,6 +43,10 @@ public class OrganizationServiceImpl implements OrganizationService{
                     if (StringUtils.isNotBlank(keyword)) {
                         predict.getExpressions().add(criteriaBuilder.like(exp1, "%" + keyword + "%"));
                     }
+                }
+                if (organizationType != 0) {
+                    Path<Integer> path = root.get("organizationType");
+                    predict.getExpressions().add(criteriaBuilder.equal(path, organizationType));
                 }
                 return predict;
             }
@@ -93,12 +97,15 @@ public class OrganizationServiceImpl implements OrganizationService{
 
     @Override
     public List<OrganizationEntity> finByLetter(String letter, int type, int organizationType) {
-        String sql = "select * from organization where get_first_pinyin_char(name) = ? AND type = ? AND shield = 0";
+        String sql = "select * from organization where get_first_pinyin_char(name) = ? AND shield = 0";
+        if (type == 1) {
+            sql += " AND type= " + type;
+        }
         if (organizationType != 0) {
             sql += " AND organizationType = " + organizationType;
         }
         RowMapper<OrganizationEntity> rowMapper = new BeanPropertyRowMapper<>(OrganizationEntity.class);
-        List<OrganizationEntity> list = jdbcTemplate.query(sql, rowMapper, letter, type);
+        List<OrganizationEntity> list = jdbcTemplate.query(sql, rowMapper, letter);
         return list;
     }
 
@@ -139,8 +146,10 @@ public class OrganizationServiceImpl implements OrganizationService{
                     Path<Integer> path = root.get("organizationType");
                     predict.getExpressions().add(criteriaBuilder.equal(path, String.valueOf(organizationType)));
                 }
-                Path<Integer> path = root.get("type");
-                predict.getExpressions().add(criteriaBuilder.equal(path, String.valueOf(type)));
+                if (type == 1) {
+                    Path<Integer> path = root.get("type");
+                    predict.getExpressions().add(criteriaBuilder.equal(path, String.valueOf(type)));
+                }
                 Path<Integer> path1 = root.get("shield");
                 predict.getExpressions().add(criteriaBuilder.equal(path1, String.valueOf(0)));
                 return predict;
@@ -162,15 +171,39 @@ public class OrganizationServiceImpl implements OrganizationService{
 
     @Override
     public List<OrganizationEntity> findByShieldAndType(int shield, int type) {
-        List<OrganizationEntity> list = organizationRepository.findByShieldAndType(shield, type);
+        String sql = "select * from organization where shield = 0";
+        if (type == 1) {
+            sql += " AND type = " + type;
+        }
+        RowMapper<OrganizationEntity> rowMapper = new BeanPropertyRowMapper<>(OrganizationEntity.class);
+        List<OrganizationEntity> list = jdbcTemplate.query(sql, rowMapper);
         return list;
     }
 
     @Override
     public List<OrganizationEntity> findByOrganizationType(int type, int organizationType) {
-        String sql = "select * from organization where type = ? AND organizationType = ? AND shield = 0";
+        String sql = "select * from organization where organizationType = ? AND shield = 0";
+        if (type == 1) {
+            sql += " AND type = " + type;
+        }
         RowMapper<OrganizationEntity> rowMapper = new BeanPropertyRowMapper<>(OrganizationEntity.class);
-        List<OrganizationEntity> list = jdbcTemplate.query(sql, rowMapper, type, organizationType);
+        List<OrganizationEntity> list = jdbcTemplate.query(sql, rowMapper, organizationType);
         return list;
     }
+
+    @Override
+    public List<OrganizationEntity> findByTerritoryNameNotNull(int type, int shield, int organizationType) {
+        String sql = "select id, name from organization where shield = ? ";
+        if (type == 1) {
+            sql += " AND type = " + type;
+        }
+        if (organizationType != 0) {
+            sql += " AND organizationType =  " + organizationType;
+        }
+        sql += " AND territoryName IS NOT NULL ORDER BY sortIndex";
+        RowMapper<OrganizationEntity> rowMapper = new BeanPropertyRowMapper<>(OrganizationEntity.class);
+        List<OrganizationEntity> list = jdbcTemplate.query(sql, rowMapper, shield);
+        return list;
+    }
+
 }

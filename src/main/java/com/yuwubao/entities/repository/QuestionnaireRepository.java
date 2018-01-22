@@ -9,4 +9,6 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
  */
 public interface QuestionnaireRepository extends JpaRepository<QuestionnaireEntity, Integer>, JpaSpecificationExecutor<QuestionnaireEntity> {
     QuestionnaireEntity findByClientUserId(int clientUserId);
+
+    QuestionnaireEntity findByClientUserIdAndArticleId(int clientUserId, int articleId);
 }

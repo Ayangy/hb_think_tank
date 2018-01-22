@@ -14,6 +14,11 @@ public class RestApiResponse<T> {
     private int status;
 
     /**
+     * 分页数据
+     */
+    private PageUtil page;
+
+    /**
      * 结果
      */
     private T result;
@@ -57,6 +62,14 @@ public class RestApiResponse<T> {
         this.result = result;
     }
 
+    public PageUtil getPage() {
+        return page;
+    }
+
+    public void setPage(PageUtil page) {
+        this.page = page;
+    }
+
     /**
      * 成功之后的返回
      *
@@ -78,6 +91,31 @@ public class RestApiResponse<T> {
         this.status = status;
         this.result = result;
         this.message = mess;
+    }
+
+    /**
+     * 成功之后的返回
+     *
+     * @param status
+     * @param result
+     */
+    public void successResponse(int status, T result, PageUtil page) {
+        this.status = status;
+        this.result = result;
+        this.page = page;
+    }
+
+    /**
+     * 成功之后的返回
+     *
+     * @param status
+     * @param result
+     */
+    public void successResponse(int status, T result,String mess, PageUtil page) {
+        this.status = status;
+        this.result = result;
+        this.message = mess;
+        this.page = page;
     }
 
     /**

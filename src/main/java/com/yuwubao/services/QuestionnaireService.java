@@ -11,7 +11,7 @@ import java.util.Map;
  */
 public interface QuestionnaireService {
 
-    QuestionnaireEntity findByClientUserId(int clientUserId);
+    QuestionnaireEntity findByClientUserIdAndArticleId(int clientUserId, int articleId);
 
     QuestionnaireEntity save(QuestionnaireEntity questionnaireEntity);
 

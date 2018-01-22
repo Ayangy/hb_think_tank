@@ -15,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * Created by yangyu on 2017/10/19.
  */
@@ -73,21 +75,21 @@ public class LoginController {
         try {
             String username = userVo.getUsername();
             String pwd = MD5.md5(userVo.getPassword());
-            ClientUserEntity clientUserEntity;
+            List<ClientUserEntity> clientUserEntity;
             if (userVo.getUsername().matches("[\\w\\.\\-]+@([\\w\\-]+\\.)+[\\w\\-]+")) {
                 clientUserEntity = clientUserService.findByEmailAndPwd(username, pwd);
             }else {
-                clientUserEntity = clientUserService.findByNameAndPwd(username, pwd);
+                clientUserEntity = clientUserService.findByNameAndPwdAndStatus(username, pwd, 1);
             }
-            if (clientUserEntity == null) {
+            if (clientUserEntity.size() == 0) {
                 result.failedApiResponse(Const.FAILED, "账号或密码错误");
                 return result;
             }
-            if(clientUserEntity.getStatus() == 0){
+            if(clientUserEntity.get(0).getStatus() == 0){
                 result.failedApiResponse(Const.FAILED, "账号未激活");
                 return result;
             }
-            result.successResponse(Const.SUCCESS, clientUserEntity, "登录成功");
+            result.successResponse(Const.SUCCESS, clientUserEntity.get(0), "登录成功");
         } catch (Exception e) {
             logger.warn("登录异常", e);
             result.failedApiResponse(Const.FAILED, "登录异常");

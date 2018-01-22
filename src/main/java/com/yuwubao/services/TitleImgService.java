@@ -22,4 +22,6 @@ public interface TitleImgService {
     TitleImgEntity update(TitleImgEntity titleImgEntity);
 
     List<TitleImgEntity> findByState(int state);
+
+    List<TitleImgEntity> findByStateAndAdvertisingPlace(int i, int advertisingPlace);
 }

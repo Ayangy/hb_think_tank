@@ -195,7 +195,8 @@ public class ArticleSearchController {
      * 删除索引
      *
      */
-    @DeleteMapping("/es/deleteIndex")
+    //@DeleteMapping("/es/deleteIndex")
+    @PostMapping("/es/deleteIndex")
     public RestApiResponse<Boolean> deleteIndex(@RequestParam(required = false, defaultValue = "zk") String index) {
         RestApiResponse<Boolean> result = new RestApiResponse<Boolean>();
         try {

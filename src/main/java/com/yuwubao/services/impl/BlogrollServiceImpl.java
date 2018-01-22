@@ -8,7 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -79,7 +81,9 @@ public class BlogrollServiceImpl implements BlogrollService {
 
     @Override
     public List<BlogrollEntity> findByType(int type) {
-        List<BlogrollEntity> list = blogrollRepository.findByType(type);
+        String sql = "select * from blogroll where type=? ORDER BY sortIndex";
+        RowMapper<BlogrollEntity> rowMapper = new BeanPropertyRowMapper<>(BlogrollEntity.class);
+        List<BlogrollEntity> list = jdbcTemplate.query(sql, rowMapper, type);
         return list;
     }
 }

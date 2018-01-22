@@ -3,7 +3,8 @@ package com.yuwubao.entities;
 import javax.persistence.*;
 
 /**
- * Created by yangyu on 2017/12/20.
+ * Created by yangyu on 2017/12/20
+ * 前端用户实体.
  */
 @Entity
 @Table(name = "client_user")

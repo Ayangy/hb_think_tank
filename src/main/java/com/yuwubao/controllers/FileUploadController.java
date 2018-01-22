@@ -32,7 +32,8 @@ public class FileUploadController {
 
     /**
      * 将上传的图片保存到本地
-     * @param file  上传的文件
+     * @param type  0(图片), 1(视频), 2(调查问卷附件), 3(调查问卷反馈结果附件)
+     * @param file 上传的文件
      * @return
      */
     @PostMapping("/upload")

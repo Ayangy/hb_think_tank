@@ -1,8 +1,10 @@
 package com.yuwubao.controllers;
 
+import com.yuwubao.entities.OperationNoteEntity;
 import com.yuwubao.entities.RoleEntity;
 import com.yuwubao.entities.UserEntity;
 import com.yuwubao.entities.UserRoleEntity;
+import com.yuwubao.services.OperationNoteService;
 import com.yuwubao.services.RoleService;
 import com.yuwubao.services.UserRoleService;
 import com.yuwubao.services.UserService;
@@ -41,6 +43,9 @@ public class UserController {
 
     @Autowired
     private UserRoleService userRoleService;
+
+    @Autowired
+    private OperationNoteService operationNoteService;
 
     /**
      * 分页查询用户
@@ -81,7 +86,8 @@ public class UserController {
      */
     @PostMapping("/add")
     public RestApiResponse<UserEntity> add(@RequestBody UserEntity userEntity,
-                                           @RequestParam(required = false, defaultValue = "0")int type) {
+                                           @RequestParam(required = false, defaultValue = "0")int type,
+                                           @RequestParam int userId) {
         RestApiResponse<UserEntity> result = new RestApiResponse<UserEntity>();
         try {
             RoleEntity roleEntity = roleService.findOne(userEntity.getRoleId());
@@ -109,6 +115,17 @@ public class UserController {
                 result.failedApiResponse(Const.FAILED, "添加失败");
                 return result;
             }
+
+            //保存当前用户的操作记录
+            UserEntity loginUserEntity = userService.findById(userId);
+
+            OperationNoteEntity noteEntity = new OperationNoteEntity();
+            noteEntity.setUserName(loginUserEntity.getUsername());
+            noteEntity.setOperationLog(loginUserEntity.getUsername()+"新增后台用户:" + user.getUsername());
+            noteEntity.setOperationTime(new Date());
+
+            operationNoteService.save(noteEntity);
+
             result.successResponse(Const.SUCCESS, user, "添加成功");
         } catch (Exception e) {
             logger.warn("新增用户异常:", e);
@@ -124,7 +141,7 @@ public class UserController {
      */
     //@DeleteMapping("/delete")
     @PostMapping("/delete")
-    public RestApiResponse<UserEntity> delete(@RequestParam(required = true) int id) {
+    public RestApiResponse<UserEntity> delete(@RequestParam(required = true) int id, @RequestParam int userId) {
         RestApiResponse<UserEntity> result = new RestApiResponse<UserEntity>();
         try {
             UserEntity userEntity = userService.delete(id);
@@ -132,6 +149,17 @@ public class UserController {
                 result.failedApiResponse(Const.FAILED, "该用户不存在，删除失败");
                 return result;
             }
+
+            //保存当前用户的操作记录
+            UserEntity loginUserEntity = userService.findById(userId);
+
+            OperationNoteEntity noteEntity = new OperationNoteEntity();
+            noteEntity.setUserName(loginUserEntity.getUsername());
+            noteEntity.setOperationLog(loginUserEntity.getUsername()+"删除后台用户:" + userEntity.getUsername());
+            noteEntity.setOperationTime(new Date());
+
+            operationNoteService.save(noteEntity);
+
             result.successResponse(Const.SUCCESS, userEntity, "删除成功");
         } catch (Exception e) {
             logger.warn("删除用户异常:", e);
@@ -145,7 +173,7 @@ public class UserController {
      */
     //@PutMapping("/update")
     @PostMapping("/update")
-    public RestApiResponse<UserEntity> update(@RequestBody UserEntity userEntity) {
+    public RestApiResponse<UserEntity> update(@RequestBody UserEntity userEntity, @RequestParam int userId) {
         RestApiResponse<UserEntity> result = new RestApiResponse<UserEntity>();
         try {
             if (!StringUtils.isNotBlank(userEntity.getUsername())) {
@@ -170,6 +198,17 @@ public class UserController {
             }
             userEntity.setCreateTime(entity.getCreateTime());
             UserEntity user = userService.update(userEntity);
+
+            //保存当前用户的操作记录
+            UserEntity loginUserEntity = userService.findById(userId);
+
+            OperationNoteEntity noteEntity = new OperationNoteEntity();
+            noteEntity.setUserName(loginUserEntity.getUsername());
+            noteEntity.setOperationLog(loginUserEntity.getUsername()+"修改后台用户:" + user.getUsername());
+            noteEntity.setOperationTime(new Date());
+
+            operationNoteService.save(noteEntity);
+
             result.successResponse(Const.SUCCESS, user, "修改成功");
         } catch (Exception e) {
             logger.warn("修改用户异常", e);

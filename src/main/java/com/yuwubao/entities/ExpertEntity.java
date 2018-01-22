@@ -27,22 +27,57 @@ public class ExpertEntity {
     private String name;
 
     /**
-     * 专家职位
+     * 性别
+     */
+    private String sex;
+
+    /**
+     * 籍贯
+     */
+    private String nativePlace;
+
+    /**
+     * 出生日期
+     */
+    private String dateOfBirth;
+
+    /**
+     * 职称
      */
     private String position;
 
     /**
-     *  所属机构Id
+     * 职务
+     */
+    private String duty;
+
+    /**
+     * 专家称号
+     */
+    private String expertsTitles;
+
+    /**
+     * 所属机构id
      */
     private int organizationId;
 
     /**
-     * 机构名
+     * 所属机构名
      */
     private String organizationName;
 
     /**
-     *  个人简历
+     * 学历
+     */
+    private String educational;
+
+    /**
+     * 学位
+     */
+    private String degree;
+
+    /**
+     * 简历
      */
     private String resume;
 
@@ -52,59 +87,29 @@ public class ExpertEntity {
     private String research;
 
     /**
-     * 研究领域类型0党建、1 社会、2生态、3政治、4经济、5文化、6热点专题、7国际关系
+     * 研究领域类型
      */
     private int fieldType;
 
     /**
-     * 教育背景
+     * 决策咨询成果
      */
-    private String educational;
+    private String decisionConsultingResult;
 
     /**
-     * 内部报告
+     * 学术成果
      */
-    private String report;
+    private String academicWorks;
 
     /**
-     * 学术论文
-     */
-    private String academicPaper;
-
-    /**
-     * 学术著作
-     */
-    private String composition;
-
-    /**
-     * 研究项目
-     */
-    private String researchProject;
-
-    /**
-     * 学术兼职
-     */
-    private String partTimeJob;
-
-    /**
-     * 社会荣誉
-     */
-    private String socialPrestige;
-
-    /**
-     * 研究成果
-     */
-    private String researchResult;
-
-    /**
-     * 联系方式
-     */
-    private String contactWay;
-
-    /**
-     * 是否屏蔽0(不屏蔽),1(屏蔽)
+     * 0(不屏蔽), 1(屏蔽)
      */
     private int shield;
+
+    /**
+     * 排序索引
+     */
+    private int sortIndex;
 
     public int getId() {
         return id;
@@ -130,12 +135,52 @@ public class ExpertEntity {
         this.name = name;
     }
 
+    public String getSex() {
+        return sex;
+    }
+
+    public void setSex(String sex) {
+        this.sex = sex;
+    }
+
+    public String getNativePlace() {
+        return nativePlace;
+    }
+
+    public void setNativePlace(String nativePlace) {
+        this.nativePlace = nativePlace;
+    }
+
+    public String getDateOfBirth() {
+        return dateOfBirth;
+    }
+
+    public void setDateOfBirth(String dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
+    }
+
     public String getPosition() {
         return position;
     }
 
     public void setPosition(String position) {
         this.position = position;
+    }
+
+    public String getDuty() {
+        return duty;
+    }
+
+    public void setDuty(String duty) {
+        this.duty = duty;
+    }
+
+    public String getExpertsTitles() {
+        return expertsTitles;
+    }
+
+    public void setExpertsTitles(String expertsTitles) {
+        this.expertsTitles = expertsTitles;
     }
 
     public int getOrganizationId() {
@@ -152,6 +197,22 @@ public class ExpertEntity {
 
     public void setOrganizationName(String organizationName) {
         this.organizationName = organizationName;
+    }
+
+    public String getEducational() {
+        return educational;
+    }
+
+    public void setEducational(String educational) {
+        this.educational = educational;
+    }
+
+    public String getDegree() {
+        return degree;
+    }
+
+    public void setDegree(String degree) {
+        this.degree = degree;
     }
 
     public String getResume() {
@@ -178,76 +239,20 @@ public class ExpertEntity {
         this.fieldType = fieldType;
     }
 
-    public String getEducational() {
-        return educational;
+    public String getDecisionConsultingResult() {
+        return decisionConsultingResult;
     }
 
-    public void setEducational(String educational) {
-        this.educational = educational;
+    public void setDecisionConsultingResult(String decisionConsultingResult) {
+        this.decisionConsultingResult = decisionConsultingResult;
     }
 
-    public String getReport() {
-        return report;
+    public String getAcademicWorks() {
+        return academicWorks;
     }
 
-    public void setReport(String report) {
-        this.report = report;
-    }
-
-    public String getAcademicPaper() {
-        return academicPaper;
-    }
-
-    public void setAcademicPaper(String academicPaper) {
-        this.academicPaper = academicPaper;
-    }
-
-    public String getComposition() {
-        return composition;
-    }
-
-    public void setComposition(String composition) {
-        this.composition = composition;
-    }
-
-    public String getResearchProject() {
-        return researchProject;
-    }
-
-    public void setResearchProject(String researchProject) {
-        this.researchProject = researchProject;
-    }
-
-    public String getPartTimeJob() {
-        return partTimeJob;
-    }
-
-    public void setPartTimeJob(String partTimeJob) {
-        this.partTimeJob = partTimeJob;
-    }
-
-    public String getSocialPrestige() {
-        return socialPrestige;
-    }
-
-    public void setSocialPrestige(String socialPrestige) {
-        this.socialPrestige = socialPrestige;
-    }
-
-    public String getResearchResult() {
-        return researchResult;
-    }
-
-    public void setResearchResult(String researchResult) {
-        this.researchResult = researchResult;
-    }
-
-    public String getContactWay() {
-        return contactWay;
-    }
-
-    public void setContactWay(String contactWay) {
-        this.contactWay = contactWay;
+    public void setAcademicWorks(String academicWorks) {
+        this.academicWorks = academicWorks;
     }
 
     public int getShield() {
@@ -256,5 +261,13 @@ public class ExpertEntity {
 
     public void setShield(int shield) {
         this.shield = shield;
+    }
+
+    public int getSortIndex() {
+        return sortIndex;
+    }
+
+    public void setSortIndex(int sortIndex) {
+        this.sortIndex = sortIndex;
     }
 }

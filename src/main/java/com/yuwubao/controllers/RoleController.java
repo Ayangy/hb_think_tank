@@ -1,7 +1,11 @@
 package com.yuwubao.controllers;
 
+import com.yuwubao.entities.OperationNoteEntity;
 import com.yuwubao.entities.RoleEntity;
+import com.yuwubao.entities.UserEntity;
+import com.yuwubao.services.OperationNoteService;
 import com.yuwubao.services.RoleService;
+import com.yuwubao.services.UserService;
 import com.yuwubao.util.Const;
 import com.yuwubao.util.RestApiResponse;
 import org.apache.commons.lang3.StringUtils;
@@ -14,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +36,12 @@ public class RoleController {
 
     @Autowired
     private RoleService roleService;
+
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private OperationNoteService operationNoteService;
 
     /**
      *  查询角色
@@ -64,7 +75,7 @@ public class RoleController {
      * 新增角色
      */
     @PostMapping("/add")
-    public RestApiResponse<RoleEntity> add(@RequestBody RoleEntity roleEntity) {
+    public RestApiResponse<RoleEntity> add(@RequestBody RoleEntity roleEntity, @RequestParam int userId) {
         RestApiResponse<RoleEntity> result = new RestApiResponse<RoleEntity>();
         try {
             RoleEntity entity = roleService.findByName(roleEntity.getName());
@@ -81,6 +92,17 @@ public class RoleController {
                 result.failedApiResponse(Const.FAILED, "添加角色失败");
                 return result;
             }
+
+            //保存当前用户的操作记录
+            UserEntity userEntity = userService.findById(userId);
+
+            OperationNoteEntity noteEntity = new OperationNoteEntity();
+            noteEntity.setUserName(userEntity.getUsername());
+            noteEntity.setOperationLog(userEntity.getUsername()+"新增角色:" + role.getName());
+            noteEntity.setOperationTime(new Date());
+
+            operationNoteService.save(noteEntity);
+
             result.successResponse(Const.SUCCESS, role, "添加角色成功");
         } catch (Exception e) {
             logger.warn("添加角色异常", e);
@@ -96,7 +118,7 @@ public class RoleController {
      */
     //@DeleteMapping("/delete")
     @PostMapping("/delete")
-    public RestApiResponse<RoleEntity> delete(@RequestParam(required = true) int id) {
+    public RestApiResponse<RoleEntity> delete(@RequestParam(required = true) int id, @RequestParam int userId) {
         RestApiResponse<RoleEntity> result = new RestApiResponse<RoleEntity>();
         try {
             RoleEntity role = roleService.delete(id);
@@ -104,6 +126,17 @@ public class RoleController {
                 result.failedApiResponse(Const.FAILED, "该角色不存在，删除失败");
                 return result;
             }
+
+            //保存当前用户的操作记录
+            UserEntity userEntity = userService.findById(userId);
+
+            OperationNoteEntity noteEntity = new OperationNoteEntity();
+            noteEntity.setUserName(userEntity.getUsername());
+            noteEntity.setOperationLog(userEntity.getUsername()+"删除角色:" + role.getName());
+            noteEntity.setOperationTime(new Date());
+
+            operationNoteService.save(noteEntity);
+
             result.successResponse(Const.SUCCESS, role, "删除成功");
         } catch (Exception e) {
             logger.warn("删除角色失败", e);
@@ -117,7 +150,7 @@ public class RoleController {
      */
     //@PutMapping("/update")
     @PostMapping("/update")
-    public RestApiResponse<RoleEntity> update(@RequestBody RoleEntity roleEntity) {
+    public RestApiResponse<RoleEntity> update(@RequestBody RoleEntity roleEntity, @RequestParam int userId) {
         RestApiResponse<RoleEntity> result = new RestApiResponse<RoleEntity>();
         try {
             if (!StringUtils.isNotBlank(roleEntity.getName())) {
@@ -136,6 +169,21 @@ public class RoleController {
                 result.failedApiResponse(Const.FAILED, "修改失败，角色不存在");
                 return result;
             }
+            //保存当前用户的操作记录
+            UserEntity userEntity = userService.findById(userId);
+
+            OperationNoteEntity noteEntity = new OperationNoteEntity();
+            noteEntity.setUserName(userEntity.getUsername());
+            if (oldEntity.getName().equals(roleEntity)) {
+                noteEntity.setOperationLog(userEntity.getUsername()+"修改角色:" + roleEntity.getName());
+            } else {
+                noteEntity.setOperationLog(userEntity.getUsername()+"修改角色:【"+oldEntity.getName()+ "】为【" + roleEntity.getName()+"】");
+            }
+
+            noteEntity.setOperationTime(new Date());
+
+            operationNoteService.save(noteEntity);
+
             RoleEntity role = roleService.update(roleEntity);
             result.successResponse(Const.SUCCESS, role, "修改成功");
         } catch (Exception e) {
