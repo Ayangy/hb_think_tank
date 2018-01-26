@@ -42,6 +42,8 @@ public class BlogrollEntity {
      */
     private String note;
 
+    private int sortIndex;
+
     public int getId() {
         return id;
     }
@@ -88,5 +90,13 @@ public class BlogrollEntity {
 
     public void setNote(String note) {
         this.note = note;
+    }
+
+    public int getSortIndex() {
+        return sortIndex;
+    }
+
+    public void setSortIndex(int sortIndex) {
+        this.sortIndex = sortIndex;
     }
 }
