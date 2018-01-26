@@ -572,13 +572,26 @@ public class FrontEndController {
      * @return
      */
     @GetMapping("/getInstitutionArticle")
-    public RestApiResponse<List<ArticleEntity>> getInstitutionArticle(@RequestParam int textTypeId, @RequestParam int organizationId,
+    public RestApiResponse<List<ArticleEntity>> getInstitutionArticle(@RequestParam (defaultValue = "0", required = false) int textTypeId,
+                                                                      @RequestParam (defaultValue = "0", required = false) int parentId,
+                                                                      @RequestParam (defaultValue = "0", required = false) int organizationId,
                                                                       @RequestParam(defaultValue = "0", required = false) int index,
                                                                       @RequestParam(defaultValue = "5", required = false) int size) {
         RestApiResponse<List<ArticleEntity>> result = new RestApiResponse<>();
         try {
-            List<ArticleEntity> entityList = articleService.findOrganizationArticle(textTypeId, organizationId, index, size, 0);
-            result.successResponse(Const.SUCCESS, entityList);
+            PageUtil pageUtil = new PageUtil();
+            List<ArticleEntity> entityList = articleService.findOrganizationArticle(textTypeId, parentId, organizationId, index, size, shield);
+            List<ArticleEntity> organizationArticle = articleService.findOrganizationArticle(textTypeId, parentId, organizationId, 0, 0, shield);
+
+            //分页数据
+            if (size != 0) {
+                pageUtil.setTotalElements(organizationArticle.size());
+                pageUtil.setIndex(index+1);
+                pageUtil.setSize(size);
+                pageUtil.setTotalPages(size, organizationArticle.size());
+            }
+
+            result.successResponse(Const.SUCCESS, entityList, pageUtil);
         } catch (Exception e) {
             logger.warn("获取文章列表失败", e);
             result.failedApiResponse(Const.FAILED, "获取文章列表失败");

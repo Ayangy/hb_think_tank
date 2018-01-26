@@ -45,7 +45,7 @@ public interface ArticleService {
 
     List<ArticleEntity> findByParentIdAndShield(int parentId, int shield);
 
-    List<ArticleEntity> findOrganizationArticle(int textTypeId, int organizationId, int index, int size, int i);
+    List<ArticleEntity> findOrganizationArticle(int textTypeId, int parentId, int organizationId, int index, int size, int i);
 
     List<ArticleEntity> getDatabase(int index, int size, String keyword, String beginTime, String endTime);
 
