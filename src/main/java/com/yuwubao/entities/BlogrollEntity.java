@@ -42,6 +42,9 @@ public class BlogrollEntity {
      */
     private String note;
 
+    /**
+     * 排序索引
+     */
     private int sortIndex;
 
     public int getId() {
