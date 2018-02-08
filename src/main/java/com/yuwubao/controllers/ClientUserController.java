@@ -70,8 +70,8 @@ public class ClientUserController {
                 String emailType = "湖北智库网新用户激活";
                 String emailContent = "您好：\n" +
                         "感谢您注册湖北智库网，点击或复制到浏览器打开下方链接，激活您的账号"+
-                        "<a href='http://localhost/active.html?id=" + entity.getId() + "&ActivationCode=" +entity.getActivationCode()+
-                        "' _act='check_domail'>http://localhost/active.html?id="+ entity.getId() +"&ActivationCode=" +entity.getActivationCode()+ "</a>";
+                        "<a href='http://www.hbzhiku.org.cn/active.html?id=" + entity.getId() + "&ActivationCode=" +entity.getActivationCode()+
+                        "' _act='check_domail'>http://www.hbzhiku.org.cn/active.html?id="+ entity.getId() +"&ActivationCode=" +entity.getActivationCode()+ "</a>";
 
                 //发送邮件到邮箱
                 Sendmail send = new Sendmail(entity, myEmailSMTPHost, myEmailAccount, myEmailPwd, emailType, emailContent);

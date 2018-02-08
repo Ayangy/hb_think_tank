@@ -267,21 +267,35 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public List<ArticleEntity> findOrganizationArticle(int textTypeId, int organizationId, int index, int size, int shield) {
-        String sql = "select a.id," +
+    public List<ArticleEntity> findOrganizationArticle(int textTypeId, int parentId, int organizationId, int index, int size, int shield) {
+        String sql = "SELECT a.id," +
                 "a.title," +
-                "a.author," +
-                "a.createdDate," +
-                "a.content," +
-                "a.imgUrl," +
-                "a.imgState," +
-                "a.textTypeId," +
-                "a.organizationId," +
-                "a.addTime," +
-                "a.shield," +
-                "a.recommend from article a, article_sort s where a.textTypeId = s.id and a.textTypeId = ? AND a.shield = ? AND a.organizationId = ? ORDER BY a.addTime Desc limit ?,?";
+                " a.addTime," +
+                " a.imgUrl," +
+                " a.content," +
+                " a.imgState," +
+                " a.textTypeId," +
+                " a.author," +
+                " a.literatureType, a.source from article a , article_sort s where a.textTypeId = s.id AND a.shield = ?";
+        if (textTypeId != 0) {
+            sql += " AND a.textTypeId = " + String.valueOf(textTypeId);
+        }
+        if (parentId != 0) {
+            sql += " AND s.parentId = " + String.valueOf(parentId);
+        }
+        if (organizationId != 0) {
+            sql += " AND a.organizationId = " + String.valueOf(organizationId);
+        }
+        sql += " order by a.addTime desc ";
+        if (size != 0) {
+            if (index == 0) {
+                sql += " LIMIT " + index + "," + size;
+            } else {
+                sql += " LIMIT " + index*size + "," + size;
+            }
+        }
         RowMapper<ArticleEntity> rowMapper = new BeanPropertyRowMapper<>(ArticleEntity.class);
-        List<ArticleEntity> list = jdbcTemplate.query(sql, rowMapper, textTypeId, shield, organizationId, index, size);
+        List<ArticleEntity> list = jdbcTemplate.query(sql, rowMapper, shield);
         return list;
     }
 

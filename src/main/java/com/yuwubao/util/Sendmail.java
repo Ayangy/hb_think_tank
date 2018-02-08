@@ -63,6 +63,9 @@ public class Sendmail extends Thread {
             //To: 收件人（可以增加多个收件人、抄送、密送）
             message.setRecipient(MimeMessage.RecipientType.TO, new InternetAddress(clientUserEntity.getEmail(), clientUserEntity.getName(), "UTF-8"));
 
+            //163邮箱需要抄送给发送方
+            message.setRecipient(MimeMessage.RecipientType.CC, new InternetAddress(myEmailAccount, "UTF-8"));
+
             //邮件主题（标题有广告嫌疑，避免被邮件服务器误认为是滥发广告以至返回失败，请修改标题）
             message.setSubject(emailType, "UTF-8");
 
