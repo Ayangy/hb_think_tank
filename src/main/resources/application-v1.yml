@@ -11,13 +11,7 @@ spring:
     elasticsearch:
       repositories:
         enabled: true
-<<<<<<< HEAD
       cluster-nodes: 172.25.243.129:9300
-#      cluster-nodes: 139.196.86.51:9300
-=======
-#      cluster-nodes: 127.0.0.1:9300
-      cluster-nodes: 139.196.86.51:9300
->>>>>>> 95a22d7a94491dfe74f966d687e1ac74829d9d80
       cluster-name: elasticsearch
 
   datasource:
@@ -40,6 +34,7 @@ spring:
   http:
     multipart:
       max-file-size: 100Mb
+      max-request-size: 100Mb
   aop:
     auto: true
 #    proxy-target-class: false
