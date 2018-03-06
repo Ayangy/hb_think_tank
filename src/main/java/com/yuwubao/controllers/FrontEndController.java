@@ -498,7 +498,7 @@ public class FrontEndController {
     @GetMapping("/getRecommendArticle")
     public RestApiResponse<List<ArticleEntity>> getRecommendArticle(@RequestParam(required = false, defaultValue = "1")int recommend,
                                                                     @RequestParam(defaultValue = "0", required = false) int index,
-                                                                    @RequestParam(defaultValue = "5", required = false) int size) {
+                                                                    @RequestParam(defaultValue = "3", required = false) int size) {
         RestApiResponse<List<ArticleEntity>> result = new RestApiResponse<List<ArticleEntity>>();
         try {
             List<ArticleEntity> list = articleService.getRecommendArticle(recommend, index, size);
