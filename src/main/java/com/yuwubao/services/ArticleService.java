@@ -54,4 +54,6 @@ public interface ArticleService {
     List<ArticleEntity> findLiteratureList(int index, int size, int literatureType);
 
     List<ArticleEntity> findByArticleSortAndShieldPage(int textTypeId, int parentId, int shield, int index, int size);
+
+    ArticleEntity getNotice();
 }

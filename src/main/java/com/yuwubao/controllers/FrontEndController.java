@@ -1058,6 +1058,28 @@ public class FrontEndController {
         }
         return result;
     }
+
+    /**
+     * 获取通知公告
+     */
+    @GetMapping("/getNotice")
+    public RestApiResponse<String> getNotice() {
+        RestApiResponse<String> result = new RestApiResponse<String>();
+        try {
+
+            ArticleEntity articleEntity = articleService.getNotice();
+            String notice = "";
+            if (articleEntity != null) {
+                notice = articleEntity.getTitle();
+            }
+            result.successResponse(Const.SUCCESS, notice );
+
+        } catch (Exception e) {
+            logger.warn("获取通知公告异常", e);
+            result.failedApiResponse(Const.FAILED, "获取通知公告异常");
+        }
+        return result;
+    }
 }
 
 

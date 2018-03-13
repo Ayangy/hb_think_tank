@@ -391,4 +391,14 @@ public class ArticleServiceImpl implements ArticleService {
         return list;
     }
 
+    @Override
+    public ArticleEntity getNotice() {
+        String sql = "SELECT a.title from article a , article_sort s where a.textTypeId = s.id AND a.shield = 0 " +
+                "AND s.parentId = 20 order by a.addTime desc  LIMIT 0, 1";
+
+        RowMapper<ArticleEntity> rowMapper = new BeanPropertyRowMapper<>(ArticleEntity.class);
+        ArticleEntity articleEntity = jdbcTemplate.queryForObject(sql, rowMapper);
+        return articleEntity;
+    }
+
 }
