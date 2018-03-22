@@ -88,6 +88,11 @@ public class ArticleEntity implements Serializable {
      */
     private int literatureType;
 
+    /**
+     * 是否置顶0(否),1(是)
+     */
+    private int top;
+
     public int getId() {
         return id;
     }
@@ -206,5 +211,13 @@ public class ArticleEntity implements Serializable {
 
     public void setLiteratureType(int literatureType) {
         this.literatureType = literatureType;
+    }
+
+    public int getTop() {
+        return top;
+    }
+
+    public void setTop(int top) {
+        this.top = top;
     }
 }

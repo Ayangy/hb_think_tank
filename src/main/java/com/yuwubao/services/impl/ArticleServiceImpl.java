@@ -378,7 +378,7 @@ public class ArticleServiceImpl implements ArticleService {
         if (parentId != 0) {
             sql += " AND s.parentId = " + String.valueOf(parentId);
         }
-        sql += " order by a.addTime desc ";
+        sql += " order by a.top desc, a.addTime desc ";
         if (size != 0) {
             if (index == 0) {
                 sql += " LIMIT " + index + "," + size;
