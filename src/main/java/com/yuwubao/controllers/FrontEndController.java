@@ -1063,16 +1063,12 @@ public class FrontEndController {
      * 获取通知公告
      */
     @GetMapping("/getNotice")
-    public RestApiResponse<String> getNotice() {
-        RestApiResponse<String> result = new RestApiResponse<String>();
+    public RestApiResponse<ArticleEntity> getNotice() {
+        RestApiResponse<ArticleEntity> result = new RestApiResponse<ArticleEntity>();
         try {
 
             ArticleEntity articleEntity = articleService.getNotice();
-            String notice = "";
-            if (articleEntity != null) {
-                notice = articleEntity.getTitle();
-            }
-            result.successResponse(Const.SUCCESS, notice );
+            result.successResponse(Const.SUCCESS, articleEntity );
 
         } catch (Exception e) {
             logger.warn("获取通知公告异常", e);
