@@ -378,7 +378,7 @@ public class ArticleServiceImpl implements ArticleService {
         if (parentId != 0) {
             sql += " AND s.parentId = " + String.valueOf(parentId);
         }
-        sql += " order by a.addTime desc ";
+        sql += " order by a.top desc, a.addTime desc ";
         if (size != 0) {
             if (index == 0) {
                 sql += " LIMIT " + index + "," + size;
@@ -393,7 +393,7 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public ArticleEntity getNotice() {
-        String sql = "SELECT a.title from article a , article_sort s where a.textTypeId = s.id AND a.shield = 0 " +
+        String sql = "SELECT a.id, a.title from article a , article_sort s where a.textTypeId = s.id AND a.shield = 0 " +
                 "AND s.parentId = 20 order by a.addTime desc  LIMIT 0, 1";
 
         RowMapper<ArticleEntity> rowMapper = new BeanPropertyRowMapper<>(ArticleEntity.class);
