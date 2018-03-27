@@ -43,7 +43,7 @@ public class ArticleServiceImpl implements ArticleService {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Specification<ArticleEntity> spec = new Specification<ArticleEntity>() {
             @Override
-            public Predicate toPredicate(Root<ArticleEntity> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder){
+            public Predicate toPredicate(Root<ArticleEntity> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
                 Predicate predict = criteriaBuilder.conjunction();
                 if (StringUtils.isNotBlank(field)) {
                     Path<String> exp1 = root.get(field);
@@ -112,15 +112,15 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public List<Map<String, Object>> getAll(int pageIndex,int pageSize) {
-        String sql = "SELECT * FROM article limit " + pageIndex + ","+ pageSize ;
+    public List<Map<String, Object>> getAll(int pageIndex, int pageSize) {
+        String sql = "SELECT * FROM article limit " + pageIndex + "," + pageSize;
         List<Map<String, Object>> maps = jdbcTemplate.queryForList(sql);
         return maps;
     }
 
     @Override
     public List<ArticleEntity> getHomeArticle(int textTypeId, int shield, int index, int size) {
-        String sql = "select * from article WHERE textTypeId = ? AND shield = ? order by addTime desc limit ?, ?";
+        String sql = "SELECT * FROM article WHERE textTypeId = ? AND shield = ? ORDER BY addTime DESC LIMIT ?, ?";
         RowMapper<ArticleEntity> rowMapper = new BeanPropertyRowMapper<>(ArticleEntity.class);
         List<ArticleEntity> list = jdbcTemplate.query(sql, rowMapper, textTypeId, shield, index, size);
         return list;
@@ -128,8 +128,11 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public ArticleEntity findById(int id) {
-        return articleRepository.findOne(id);
-
+        ArticleEntity entity = articleRepository.findOne(id);
+        int num = entity.getClicknum();
+        entity.setClicknum(num + 1);
+        articleRepository.save(entity);
+        return entity;
     }
 
     @Override
@@ -148,7 +151,7 @@ public class ArticleServiceImpl implements ArticleService {
             if (index == 0) {
                 sql += " LIMIT " + index + "," + size;
             } else {
-                sql += " LIMIT " + index*size + "," + size;
+                sql += " LIMIT " + index * size + "," + size;
             }
         }
         RowMapper<ArticleEntity> rowMapper = new BeanPropertyRowMapper<>(ArticleEntity.class);
@@ -163,7 +166,7 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public List<ArticleEntity> findByCriteria(Map<String, String> map, int parentId,int textTypeId, int sort, int index, int size) {
+    public List<ArticleEntity> findByCriteria(Map<String, String> map, int parentId, int textTypeId, int sort, int index, int size) {
         String keyword = map.get("keyword");
         String sql = "SELECT a.id," +
                 "a.title," +
@@ -185,7 +188,7 @@ public class ArticleServiceImpl implements ArticleService {
         }
         if (StringUtils.isNotBlank(keyword)) {
             sql += " and ( a.title LIKE '%" + keyword + "%'" +
-                    "OR a.author LIKE '%" + keyword +"%'" +
+                    "OR a.author LIKE '%" + keyword + "%'" +
                     "OR a.content LIKE '%" + keyword + "%'" +
                     ")";
         }
@@ -199,7 +202,7 @@ public class ArticleServiceImpl implements ArticleService {
             if (index == 0) {
                 sql += " limit " + index + ", " + size;
             } else {
-                sql += " limit " + index*size + ", " + size;
+                sql += " limit " + index * size + ", " + size;
             }
         }
         RowMapper<ArticleEntity> rowMapper = new BeanPropertyRowMapper<>(ArticleEntity.class);
@@ -217,7 +220,7 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public List<ArticleEntity> getRecommendArticle(int recommend, int index, int size) {
-        String sql = "SELECT * from article WHERE recommend = ? AND shield = 0 ORDER BY addTime DESC LIMIT ?,?;";
+        String sql = "SELECT * FROM article WHERE recommend = ? AND shield = 0 ORDER BY addTime DESC LIMIT ?,?;";
         RowMapper<ArticleEntity> rowMapper = new BeanPropertyRowMapper<>(ArticleEntity.class);
         List<ArticleEntity> list = jdbcTemplate.query(sql, rowMapper, recommend, index, size);
         return list;
@@ -225,7 +228,7 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public List<ArticleEntity> getNewestArticle(int index, int size) {
-        String sql = "SELECT * from article WHERE shield = 0 ORDER BY addTime DESC LIMIT ?,?;";
+        String sql = "SELECT * FROM article WHERE shield = 0 ORDER BY addTime DESC LIMIT ?,?;";
         RowMapper<ArticleEntity> rowMapper = new BeanPropertyRowMapper<>(ArticleEntity.class);
         List<ArticleEntity> list = jdbcTemplate.query(sql, rowMapper, index, size);
         return list;
@@ -233,7 +236,7 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public ArticleEntity getAnOrganizationNotice(int id, int textTypeId) {
-        String sql = "SELECT * from article WHERE organizationId = ? AND textTypeId = ? AND shield = 0 ORDER BY addTime DESC LIMIT 0,1";
+        String sql = "SELECT * FROM article WHERE organizationId = ? AND textTypeId = ? AND shield = 0 ORDER BY addTime DESC LIMIT 0,1";
         RowMapper<ArticleEntity> rowMapper = new BeanPropertyRowMapper<>(ArticleEntity.class);
         List<ArticleEntity> list = jdbcTemplate.query(sql, rowMapper, id, textTypeId);
         if (list.size() > 0) {
@@ -244,7 +247,7 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public List<ArticleEntity> getOrganizationActivity(int id, int textTypeId, int index, int size) {
-        String sql = "SELECT * from article WHERE organizationId = ? AND textTypeId = ? AND shield = 0 ORDER BY addTime DESC LIMIT ?,?";
+        String sql = "SELECT * FROM article WHERE organizationId = ? AND textTypeId = ? AND shield = 0 ORDER BY addTime DESC LIMIT ?,?";
         RowMapper<ArticleEntity> rowMapper = new BeanPropertyRowMapper<>(ArticleEntity.class);
         List<ArticleEntity> list = jdbcTemplate.query(sql, rowMapper, id, textTypeId, index, size);
         return list;
@@ -258,9 +261,9 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public List<ArticleEntity> findByParentIdAndShield(int parentId, int shield) {
-        String sql = "select a.id," +
+        String sql = "SELECT a.id," +
                 "a.title," +
-                "a.imgUrl from article a, article_sort s where a.textTypeId = s.id and s.parentId = ? AND a.shield = ? ORDER BY a.addTime DESC";
+                "a.imgUrl FROM article a, article_sort s WHERE a.textTypeId = s.id AND s.parentId = ? AND a.shield = ? ORDER BY a.addTime DESC";
         RowMapper<ArticleEntity> rowMapper = new BeanPropertyRowMapper<>(ArticleEntity.class);
         List<ArticleEntity> list = jdbcTemplate.query(sql, rowMapper, parentId, shield);
         return list;
@@ -291,7 +294,7 @@ public class ArticleServiceImpl implements ArticleService {
             if (index == 0) {
                 sql += " LIMIT " + index + "," + size;
             } else {
-                sql += " LIMIT " + index*size + "," + size;
+                sql += " LIMIT " + index * size + "," + size;
             }
         }
         RowMapper<ArticleEntity> rowMapper = new BeanPropertyRowMapper<>(ArticleEntity.class);
@@ -314,14 +317,14 @@ public class ArticleServiceImpl implements ArticleService {
                 "a.shield," +
                 "a.recommend FROM article a, article_sort s WHERE a.textTypeId = s.id AND s.parentId = 25 ";
         if (StringUtils.isNotBlank(beginTime)) {
-            sql += " AND a.addTime > '" + beginTime +"'";
+            sql += " AND a.addTime > '" + beginTime + "'";
             if (StringUtils.isNotBlank(endTime)) {
                 sql += " AND a.addTime < '" + endTime + "'";
             }
         }
         if (StringUtils.isNotBlank(keyword)) {
             sql += " and ( title LIKE '%" + keyword + "%'" +
-                    "OR author LIKE '%" + keyword +"%'" +
+                    "OR author LIKE '%" + keyword + "%'" +
                     "OR content LIKE '%" + keyword + "%'" +
                     ")";
         }
@@ -330,7 +333,7 @@ public class ArticleServiceImpl implements ArticleService {
             if (index == 0) {
                 sql += " limit " + index + ", " + size;
             } else {
-                sql += " limit " + index*size + ", " + size;
+                sql += " limit " + index * size + ", " + size;
             }
         }
         RowMapper<ArticleEntity> rowMapper = new BeanPropertyRowMapper<>(ArticleEntity.class);
@@ -339,25 +342,25 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public List<ArticleEntity> findByString(String query,int textTypeId, int index, int size) {
+    public List<ArticleEntity> findByString(String query, int textTypeId, int index, int size) {
         String sql = "SELECT * FROM article  WHERE  textTypeId = ? AND shield = 0";
         if (StringUtils.isNotBlank(query)) {
             sql += " and ( title LIKE '%" + query + "%'" +
-                    "OR author LIKE '%" + query +"%'" +
+                    "OR author LIKE '%" + query + "%'" +
                     "OR content LIKE '%" + query + "%'" +
                     ")";
         }
         sql += "limit ?,?";
         RowMapper<ArticleEntity> rowMapper = new BeanPropertyRowMapper<>(ArticleEntity.class);
-        List<ArticleEntity> list = jdbcTemplate.query(sql, rowMapper,textTypeId, index, size);
+        List<ArticleEntity> list = jdbcTemplate.query(sql, rowMapper, textTypeId, index, size);
         return list;
     }
 
     @Override
     public List<ArticleEntity> findLiteratureList(int index, int size, int literatureType) {
-        String sql = "SELECT * FROM article  WHERE  literatureType = ? AND shield = 0 limit ?,?";
+        String sql = "SELECT * FROM article  WHERE  literatureType = ? AND shield = 0 LIMIT ?,?";
         RowMapper<ArticleEntity> rowMapper = new BeanPropertyRowMapper<>(ArticleEntity.class);
-        List<ArticleEntity> list = jdbcTemplate.query(sql, rowMapper,literatureType, index, size);
+        List<ArticleEntity> list = jdbcTemplate.query(sql, rowMapper, literatureType, index, size);
         return list;
     }
 
@@ -383,7 +386,7 @@ public class ArticleServiceImpl implements ArticleService {
             if (index == 0) {
                 sql += " LIMIT " + index + "," + size;
             } else {
-                sql += " LIMIT " + index*size + "," + size;
+                sql += " LIMIT " + index * size + "," + size;
             }
         }
         RowMapper<ArticleEntity> rowMapper = new BeanPropertyRowMapper<>(ArticleEntity.class);
@@ -393,8 +396,8 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public ArticleEntity getNotice() {
-        String sql = "SELECT a.id, a.title from article a , article_sort s where a.textTypeId = s.id AND a.shield = 0 " +
-                "AND s.parentId = 20 order by a.addTime desc  LIMIT 0, 1";
+        String sql = "SELECT a.id, a.title FROM article a , article_sort s WHERE a.textTypeId = s.id AND a.shield = 0 " +
+                "AND s.parentId = 20 ORDER BY a.addTime DESC  LIMIT 0, 1";
 
         RowMapper<ArticleEntity> rowMapper = new BeanPropertyRowMapper<>(ArticleEntity.class);
         ArticleEntity articleEntity = jdbcTemplate.queryForObject(sql, rowMapper);

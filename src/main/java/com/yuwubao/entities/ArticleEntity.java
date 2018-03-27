@@ -93,6 +93,16 @@ public class ArticleEntity implements Serializable {
      */
     private int top;
 
+    private int clicknum;
+
+    public int getClicknum() {
+        return clicknum;
+    }
+
+    public void setClicknum(int clicknum) {
+        this.clicknum = clicknum;
+    }
+
     public int getId() {
         return id;
     }
