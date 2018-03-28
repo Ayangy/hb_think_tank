@@ -11,13 +11,13 @@ spring:
     elasticsearch:
       repositories:
         enabled: true
-#      cluster-nodes: 127.0.0.1:9300
-      cluster-nodes: 139.196.86.51:9300
+      cluster-nodes: 172.25.243.129:9300
       cluster-name: elasticsearch
 
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://47.104.8.66:3306/think_tank?useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull
+    #url: jdbc:mysql://47.104.8.66:3306/think_tank?useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull
+    url: jdbc:mysql:///thinktank?useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull
     username: yuwubao
     password: 12345
     tomcat:
@@ -34,6 +34,7 @@ spring:
   http:
     multipart:
       max-file-size: 100Mb
+      max-request-size: 100Mb
   aop:
     auto: true
 #    proxy-target-class: false
