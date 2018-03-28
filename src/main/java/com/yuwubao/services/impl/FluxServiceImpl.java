@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 
 @Service
-public class FluxServiceImpl  implements FluxService{
+public class FluxServiceImpl implements FluxService {
     @Resource
     private FluxRepo fluxRepo;
 
@@ -17,7 +17,7 @@ public class FluxServiceImpl  implements FluxService{
     public FluxEntity getFlux() {
         FluxEntity entity = fluxRepo.findOne(1);
         int num = entity.getFluxnum();
-        entity.setFluxnum(num++);
+        entity.setFluxnum(num + 1);
         fluxRepo.save(entity);
         return entity;
     }
